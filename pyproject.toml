@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "resty"
+version = "0.1.0"
+description = "An application for relaxing while working at a computer"
+authors = ["Alex Leskov <alexleskov2000@gmail.com>"]
+license = "MIT License"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+PyQt6 = "^6.4.2"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
