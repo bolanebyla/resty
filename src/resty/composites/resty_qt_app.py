@@ -1,5 +1,9 @@
-from resty.adapters import qt, database
+from resty.adapters import qt, database, log
 from resty.application import rest_timer
+
+
+class Logger:
+    log.configure()
 
 
 class DB:

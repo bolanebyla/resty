@@ -1,3 +1,5 @@
+import logging
+
 from PyQt6 import uic
 from PyQt6.QtCore import QThreadPool
 from PyQt6.QtGui import QAction, QIcon
@@ -15,12 +17,16 @@ class MainWindow(QMainWindow):
         super().__init__()
 
         self.rest_timer = rest_timer
+        self.logger = logging.getLogger(self.__class__.__name__)
+        self.threadpool = QThreadPool()
 
+        self.on_create()
+
+    def on_create(self):
+        self.logger.info('Creating %s...', self.__class__.__name__)
         self._init_ui()
         self._init_tray()
         self._register_signals()
-
-        self.threadpool = QThreadPool()
 
         self._start_work_timer()
 
