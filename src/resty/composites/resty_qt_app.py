@@ -10,8 +10,7 @@ class Application:
     rest_timer = rest_timer.RestTimer(timer_repo=DB.timer_repo)
 
 
-app = qt.create_app()
-window = qt.MainWindow(rest_timer=Application.rest_timer)
+app = qt.create_app(rest_timer_service=Application.rest_timer)
 
 if __name__ == '__main__':
-    app.exec()
+    app.run()
