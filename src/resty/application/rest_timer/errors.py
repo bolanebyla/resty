@@ -1,0 +1,2 @@
+class TimerCanceled(Exception):
+    pass
