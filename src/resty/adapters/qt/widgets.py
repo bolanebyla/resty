@@ -28,7 +28,7 @@ class MainWindow(QMainWindow):
         self._init_tray()
         self._register_signals()
 
-        self._start_work_timer()
+        self.start_work_timer()
 
     def _init_ui(self):
         try:
@@ -42,13 +42,13 @@ class MainWindow(QMainWindow):
     def _init_tray(self):
         icon = QIcon('resty/adapters/qt/ui/icon.png')
 
-        # Create the tray
         tray = QSystemTrayIcon(self)
         tray.setIcon(icon)
         tray.setVisible(True)
 
         menu = QMenu()
-        action = QAction('A menu item', self)
+        action = QAction('Rest now', self)
+        action.triggered.connect(self.start_rest_timer)
         menu.addAction(action)
 
         tray.setContextMenu(menu)
@@ -59,28 +59,27 @@ class MainWindow(QMainWindow):
         self.ui.btn_move_rest_by_10_min.clicked.connect(self.move_rest_by_10_min)
         self.ui.btn_finish_rest.clicked.connect(self.finish_rest)
 
-    def _start_work_timer(self, time_seconds=7):
-
+    def start_work_timer(self, *args, time_seconds=50):
         worker = Worker(self.rest_timer.start_work_timer, time_seconds)
-        worker.signals.finished.connect(self._start_rest_timer)
+        worker.signals.finished.connect(self.start_rest_timer)
 
         self.threadpool.start(worker)
 
         self.hide()
 
-    def _start_rest_timer(self, time_seconds=7):
+    def start_rest_timer(self, *args, time_seconds=50):
         worker = Worker(self.rest_timer.start_rest_timer, time_seconds)
-        worker.signals.result.connect(self._start_work_timer)
+        worker.signals.result.connect(self.start_work_timer)
 
         self.threadpool.start(worker)
 
         self.show()
 
     def move_rest_by_5_min(self):
-        self._start_work_timer(time_seconds=5)
+        self.start_work_timer(time_seconds=5)
 
     def move_rest_by_10_min(self):
-        self._start_work_timer(time_seconds=10)
+        self.start_work_timer(time_seconds=10)
 
     def finish_rest(self):
-        self._start_work_timer()
+        self.start_work_timer()
