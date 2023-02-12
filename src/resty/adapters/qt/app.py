@@ -20,6 +20,8 @@ class App(QApplication):
 def create_app(rest_timer_service: rest_timer.RestTimer):
     app = App(sys.argv)
 
+    app.setQuitOnLastWindowClosed(False)
+
     app.register_widget(widgets.MainWindow(rest_timer=rest_timer_service))
 
     return app
