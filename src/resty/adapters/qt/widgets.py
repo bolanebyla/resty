@@ -47,9 +47,14 @@ class MainWindow(QMainWindow):
         tray.setVisible(True)
 
         menu = QMenu()
-        action = QAction('Rest now', self)
-        action.triggered.connect(self.start_rest_timer)
-        menu.addAction(action)
+
+        rest_now_action = QAction('Rest now', self)
+        rest_now_action.triggered.connect(self.start_rest_timer)
+
+        exit_action = QAction('Exit', self)
+
+        menu.addAction(rest_now_action)
+        menu.addAction(exit_action)
 
         tray.setContextMenu(menu)
         tray.show()
