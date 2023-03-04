@@ -61,9 +61,17 @@ class RestWindow(QMainWindow):
         rest_now_action = QAction('Rest now', self)
         rest_now_action.triggered.connect(self.rest_now)
 
+        start_action = QAction('Start', self)
+        start_action.triggered.connect(self.start)
+
+        stop_action = QAction('Stop', self)
+        stop_action.triggered.connect(self.stop)
+
         exit_action = QAction('Exit', self)
 
         menu.addAction(rest_now_action)
+        menu.addAction(start_action)
+        menu.addAction(stop_action)
         menu.addAction(exit_action)
 
         tray.setContextMenu(menu)
@@ -102,3 +110,12 @@ class RestWindow(QMainWindow):
     def rest_now(self):
         self.logger.debug('"rest_now" btn is pressed')
         self.rest_timer_use_cases.rest_now()
+
+    def stop(self):
+        self.logger.debug('"stop" btn is pressed')
+        self.hide()
+        self.rest_timer_use_cases.stop()
+
+    def start(self):
+        self.logger.debug('"start" btn is pressed')
+        self.rest_timer_use_cases.start()

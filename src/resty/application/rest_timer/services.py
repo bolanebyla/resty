@@ -138,3 +138,22 @@ class RestTimerUseCases:
         """
         rest_timer = self.timer_repo.get_rest_timer()
         self._start_rest(rest_timer=rest_timer)
+
+    def stop(self):
+        """
+        Остановить таймер
+        """
+        rest_timer = self.timer_repo.get_rest_timer()
+
+        rest_timer.status = enums.RestTimerStatuses.stop
+        rest_timer.end_work_time = None
+        rest_timer.end_rest_time = None
+
+        self.timer_repo.save_rest_timer(rest_timer)
+
+    def start(self):
+        """
+        Начать работу
+        """
+        rest_timer = self.timer_repo.get_rest_timer()
+        self._start_work(rest_timer=rest_timer)
