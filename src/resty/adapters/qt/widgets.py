@@ -80,16 +80,21 @@ class RestWindow(QMainWindow):
         self.ui.btn_finish_rest.clicked.connect(self.finish_rest)
 
     def start_work(self):
+        self.logger.debug('Start work signal')
         self.hide()
 
     def start_rest(self):
+        self.logger.debug('Start rest signal')
         self.show()
 
     def move_rest_by_5_min(self):
         self.logger.debug('"move_rest_by_5_min" btn is pressed')
+        self.rest_timer_use_cases.move_rest_by_5_min()
 
     def move_rest_by_10_min(self):
         self.logger.debug('"move_rest_by_10_min" btn is pressed')
+        self.rest_timer_use_cases.move_rest_by_10_min()
 
     def finish_rest(self):
         self.logger.debug('"finish_rest" btn is pressed')
+        self.rest_timer_use_cases.finish_rest()

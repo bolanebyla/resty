@@ -46,6 +46,7 @@ class RestTimerUseCases:
 
         while True:
             rest_timer = self.timer_repo.get_rest_timer()
+            self.logger.debug('Timer status: %s', rest_timer.status.value)
 
             time_now = datetime.now()
 
@@ -80,3 +81,31 @@ class RestTimerUseCases:
                     )
 
             time.sleep(1)
+
+    def _move_rest(self, for_seconds: Union[float, int]):
+        self.start_work_signal.emit()
+
+        rest_timer = self.timer_repo.get_rest_timer()
+
+        rest_timer.status = enums.RestTimerStatuses.work
+        rest_timer.end_work_time = self._get_end_work_time(
+            work_time_seconds=for_seconds
+        )
+
+        self.timer_repo.save_rest_timer(rest_timer)
+
+    def move_rest_by_5_min(self):
+        self._move_rest(for_seconds=5 * 60)
+
+    def move_rest_by_10_min(self):
+        self._move_rest(for_seconds=10 * 60)
+
+    def finish_rest(self):
+        self.start_work_signal.emit()
+
+        rest_timer = self.timer_repo.get_rest_timer()
+
+        rest_timer.status = enums.RestTimerStatuses.work
+        rest_timer.end_work_time = self._get_end_work_time()
+
+        self.timer_repo.save_rest_timer(rest_timer)
