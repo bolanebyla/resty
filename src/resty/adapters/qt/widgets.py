@@ -59,7 +59,7 @@ class RestWindow(QMainWindow):
         menu = QMenu()
 
         rest_now_action = QAction('Rest now', self)
-        # rest_now_action.triggered.connect(self.start_rest_timer)
+        rest_now_action.triggered.connect(self.rest_now)
 
         exit_action = QAction('Exit', self)
 
@@ -98,3 +98,7 @@ class RestWindow(QMainWindow):
     def finish_rest(self):
         self.logger.debug('"finish_rest" btn is pressed')
         self.rest_timer_use_cases.finish_rest()
+
+    def rest_now(self):
+        self.logger.debug('"rest_now" btn is pressed')
+        self.rest_timer_use_cases.rest_now()
