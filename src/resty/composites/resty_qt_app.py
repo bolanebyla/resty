@@ -10,11 +10,24 @@ class DB:
     timer_repo = database.TimerRepo()
 
 
+class Signals:
+    start_work_signal = qt.StartWorkSignal()
+    start_rest_signal = qt.StartRestSignal()
+
+
 class Application:
-    rest_timer = rest_timer.RestTimer(timer_repo=DB.timer_repo)
+    rest_timer_use_cases = rest_timer.RestTimerUseCases(
+        timer_repo=DB.timer_repo,
+        start_work_signal=Signals.start_work_signal,
+        start_rest_signal=Signals.start_rest_signal,
+    )
 
 
-app = qt.create_app(rest_timer_service=Application.rest_timer)
+app = qt.create_app(
+    rest_timer_use_cases=Application.rest_timer_use_cases,
+    start_work_signal=Signals.start_work_signal,
+    start_rest_signal=Signals.start_rest_signal,
+)
 
 if __name__ == '__main__':
     app.run()

@@ -1,2 +1,3 @@
 from .app import create_app
-from .widgets import MainWindow
+from .widgets import RestWindow
+from .signals import StartRestSignal, StartWorkSignal

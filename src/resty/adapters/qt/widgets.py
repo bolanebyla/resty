@@ -4,20 +4,28 @@ from PyQt6 import uic
 from PyQt6.QtCore import QThreadPool
 from PyQt6.QtGui import QAction, QIcon
 from PyQt6.QtWidgets import QMainWindow, QSystemTrayIcon, QMenu
+from classic.components import component
 
 from resty.adapters.qt.handlers import Worker
 
-from resty.application.rest_timer import services
+from resty.application.rest_timer import RestTimerUseCases
+
+from . import signals
 
 
-class MainWindow(QMainWindow):
+@component
+class RestWindow(QMainWindow):
     ui = None
 
-    def __init__(self, rest_timer: services.RestTimer):
-        super().__init__()
+    rest_timer_use_cases: RestTimerUseCases
 
-        self.rest_timer = rest_timer
+    start_work_signal: signals.StartWorkSignal
+    start_rest_signal: signals.StartRestSignal
+
+    def __attrs_post_init__(self):
+        super().__init__()
         self.logger = logging.getLogger(self.__class__.__name__)
+
         self.threadpool = QThreadPool()
 
         self.on_create()
@@ -28,7 +36,9 @@ class MainWindow(QMainWindow):
         self._init_tray()
         self._register_signals()
 
-        self.start_work_timer()
+        # запускаем поток сервиса с таймером
+        worker = Worker(self.rest_timer_use_cases.start_timer)
+        self.threadpool.start(worker)
 
     def _init_ui(self):
         try:
@@ -49,7 +59,7 @@ class MainWindow(QMainWindow):
         menu = QMenu()
 
         rest_now_action = QAction('Rest now', self)
-        rest_now_action.triggered.connect(self.start_rest_timer)
+        # rest_now_action.triggered.connect(self.start_rest_timer)
 
         exit_action = QAction('Exit', self)
 
@@ -60,31 +70,26 @@ class MainWindow(QMainWindow):
         tray.show()
 
     def _register_signals(self):
+        self.start_work_signal.signal.connect(self.start_work)
+        self.start_rest_signal.signal.connect(self.start_rest)
+
         self.ui.btn_move_rest_by_5_min.clicked.connect(self.move_rest_by_5_min)
-        self.ui.btn_move_rest_by_10_min.clicked.connect(self.move_rest_by_10_min)
+        self.ui.btn_move_rest_by_10_min.clicked.connect(
+            self.move_rest_by_10_min
+        )
         self.ui.btn_finish_rest.clicked.connect(self.finish_rest)
 
-    def start_work_timer(self, *args, time_seconds=50):
-        worker = Worker(self.rest_timer.start_work_timer, time_seconds)
-        worker.signals.finished.connect(self.start_rest_timer)
-
-        self.threadpool.start(worker)
-
+    def start_work(self):
         self.hide()
 
-    def start_rest_timer(self, *args, time_seconds=50):
-        worker = Worker(self.rest_timer.start_rest_timer, time_seconds)
-        worker.signals.result.connect(self.start_work_timer)
-
-        self.threadpool.start(worker)
-
+    def start_rest(self):
         self.show()
 
     def move_rest_by_5_min(self):
-        self.start_work_timer(time_seconds=5)
+        self.logger.debug('"move_rest_by_5_min" btn is pressed')
 
     def move_rest_by_10_min(self):
-        self.start_work_timer(time_seconds=10)
+        self.logger.debug('"move_rest_by_10_min" btn is pressed')
 
     def finish_rest(self):
-        self.start_work_timer()
+        self.logger.debug('"finish_rest" btn is pressed')

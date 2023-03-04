@@ -1,37 +1,41 @@
+import copy
+from datetime import datetime
+from typing import Optional
+
 from PyQt6.QtCore import QMutex
 
-from resty.application.rest_timer import interfaces
+from resty.application.rest_timer import (
+    ITimerRepo,
+    RestTimer,
+    RestTimerStatuses, entities,
+)
 
 
-class TimerRepo(interfaces.ITimerRepo):
-    work_started = True
-    rest_started = False
+class TimerRepo(ITimerRepo):
+    _rest_timer: RestTimer = None
 
     def __init__(self):
         self.mutex = QMutex()
 
-    def set_work_start(self):
+    def create_rest_timer(
+            self,
+            status: RestTimerStatuses,
+            end_rest_time: Optional[datetime] = None,
+            end_work_time: Optional[datetime] = None,
+    ) -> RestTimer:
+        if self._rest_timer is None:
+            self._rest_timer = RestTimer(
+                end_rest_time=end_rest_time,
+                end_work_time=end_work_time,
+                status=status,
+            )
+
+        return copy.deepcopy(self._rest_timer)
+
+    def get_rest_timer(self) -> RestTimer:
+        return copy.deepcopy(self._rest_timer)
+
+    def save_rest_timer(self, rest_timer: entities.RestTimer):
         self.mutex.lock()
-        self.work_started = True
+        self._rest_timer = rest_timer
         self.mutex.unlock()
-
-    def set_rest_start(self):
-        self.mutex.lock()
-        self.rest_started = True
-        self.mutex.unlock()
-
-    def set_work_end(self):
-        self.mutex.lock()
-        self.work_started = False
-        self.mutex.unlock()
-
-    def set_rest_end(self):
-        self.mutex.lock()
-        self.rest_started = False
-        self.mutex.unlock()
-
-    def is_rest_started(self):
-        return self.rest_started
-
-    def is_work_started(self):
-        return self.work_started

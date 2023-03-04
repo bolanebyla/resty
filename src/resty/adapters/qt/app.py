@@ -4,7 +4,7 @@ import sys
 
 from resty.application import rest_timer
 
-from . import widgets
+from . import widgets, signals
 
 
 class App(QApplication):
@@ -17,11 +17,21 @@ class App(QApplication):
         self.exec()
 
 
-def create_app(rest_timer_service: rest_timer.RestTimer):
+def create_app(
+        rest_timer_use_cases: rest_timer.RestTimerUseCases,
+        start_work_signal: signals.StartWorkSignal,
+        start_rest_signal: signals.StartRestSignal,
+):
     app = App(sys.argv)
 
     app.setQuitOnLastWindowClosed(False)
 
-    app.register_widget(widgets.MainWindow(rest_timer=rest_timer_service))
+    app.register_widget(
+        widgets.RestWindow(
+            rest_timer_use_cases=rest_timer_use_cases,
+            start_work_signal=start_work_signal,
+            start_rest_signal=start_rest_signal,
+        )
+    )
 
     return app

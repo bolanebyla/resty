@@ -1,47 +1,82 @@
 import logging
 import time
+from datetime import datetime, timedelta
+from typing import Union
 
-from . import interfaces, errors
+from classic.components import component
+
+from . import interfaces, enums
 
 
-class RestTimer:
-    def __init__(self, timer_repo: interfaces.ITimerRepo):
-        self.timer_repo = timer_repo
+@component
+class RestTimerUseCases:
+    timer_repo: interfaces.ITimerRepo
 
+    start_work_signal: interfaces.ISignal
+    start_rest_signal: interfaces.ISignal
+
+    def __attrs_post_init__(self):
         self.logger = logging.getLogger(self.__class__.__name__)
 
-    def start_work_timer(self, time_seconds=10):
-        self.logger.debug('start_work_timer: %s', time_seconds)
+    @staticmethod
+    def _get_end_rest_time(
+            rest_time_seconds: Union[float, int] = 10
+    ) -> datetime:
+        end_rest_time = datetime.now() + timedelta(seconds=rest_time_seconds)
+        return end_rest_time
 
-        self.timer_repo.set_rest_end()
-        self.timer_repo.set_work_start()
+    @staticmethod
+    def _get_end_work_time(
+            work_time_seconds: Union[float, int] = 5
+    ) -> datetime:
+        end_rest_time = datetime.now() + timedelta(seconds=work_time_seconds)
+        return end_rest_time
 
-        counter = 0
-        while counter < time_seconds:
+    def start_timer(self):
+        rest_timer = self.timer_repo.create_rest_timer(
+            end_work_time=self._get_end_work_time(),
+            status=enums.RestTimerStatuses.work
+        )
+
+        self.start_work_signal.emit()
+        self.logger.debug(
+            'Work is started, it will end at %s',
+            rest_timer.end_work_time,
+        )
+
+        while True:
+            rest_timer = self.timer_repo.get_rest_timer()
+
+            time_now = datetime.now()
+
+            if rest_timer.status == enums.RestTimerStatuses.work:
+                if rest_timer.end_work_time <= time_now:
+                    # запускаем отдых
+                    self.start_rest_signal.emit()
+
+                    # меняем статус таймера на "отдых"
+                    rest_timer.status = enums.RestTimerStatuses.rest
+                    # рассчитываем время окончания отдыха
+                    rest_timer.end_rest_time = self._get_end_rest_time()
+                    self.timer_repo.save_rest_timer(rest_timer=rest_timer)
+                    self.logger.debug(
+                        'Rest is started, it will end at %s',
+                        rest_timer.end_work_time,
+                    )
+
+            elif rest_timer.status == enums.RestTimerStatuses.rest:
+                if rest_timer.end_rest_time <= time_now:
+                    # запускаем работу
+                    self.start_work_signal.emit()
+
+                    # меняем статус таймера на "работу"
+                    rest_timer.status = enums.RestTimerStatuses.work
+                    # рассчитываем время окончания работы
+                    rest_timer.end_work_time = self._get_end_work_time()
+                    self.timer_repo.save_rest_timer(rest_timer=rest_timer)
+                    self.logger.debug(
+                        'Work is started, it will end at %s',
+                        rest_timer.end_work_time,
+                    )
+
             time.sleep(1)
-            counter += 1
-
-            work_started = self.timer_repo.is_work_started()
-            if not work_started:
-                self.logger.debug('work_timer canceled')
-                raise errors.TimerCanceled()
-
-        self.timer_repo.set_work_end()
-
-    def start_rest_timer(self, time_seconds=10):
-        self.logger.debug('start_rest_timer: %s', time_seconds)
-
-        self.timer_repo.set_work_end()
-        self.timer_repo.set_rest_start()
-
-        counter = 0
-        while counter < time_seconds:
-            time.sleep(1)
-            counter += 1
-
-            rest_started = self.timer_repo.is_rest_started()
-            if not rest_started:
-                self.logger.debug('rest_timer canceled')
-                raise errors.TimerCanceled()
-
-        self.timer_repo.set_rest_end()
