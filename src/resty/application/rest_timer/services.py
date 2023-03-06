@@ -19,14 +19,9 @@ class RestTimerUseCases:
         self.logger = logging.getLogger(self.__class__.__name__)
 
     @staticmethod
-    def _get_end_rest_time(rest_time_seconds: entities.SecondsType) -> datetime:
-        end_rest_time = datetime.now() + timedelta(seconds=rest_time_seconds)
-        return end_rest_time
-
-    @staticmethod
-    def _get_end_work_time(work_time_seconds: entities.SecondsType) -> datetime:
-        end_rest_time = datetime.now() + timedelta(seconds=work_time_seconds)
-        return end_rest_time
+    def _get_end_event_time(time_seconds: entities.SecondsType) -> datetime:
+        end_event_time = datetime.now() + timedelta(seconds=time_seconds)
+        return end_event_time
 
     def _start_work(self, rest_timer: entities.RestTimer):
         """
@@ -38,13 +33,13 @@ class RestTimerUseCases:
         # меняем статус таймера на "работу"
         rest_timer.status = enums.RestTimerStatuses.work
         # рассчитываем время окончания работы
-        rest_timer.end_work_time = self._get_end_work_time(
-            work_time_seconds=rest_timer.settings.work_time_seconds
+        rest_timer.end_event_time = self._get_end_event_time(
+            time_seconds=rest_timer.settings.work_time_seconds
         )
         self.timer_repo.save_rest_timer(rest_timer=rest_timer)
         self.logger.debug(
             'Work is started, it will end at %s',
-            rest_timer.end_work_time,
+            rest_timer.end_event_time,
         )
 
     def _start_rest(self, rest_timer: entities.RestTimer):
@@ -57,13 +52,13 @@ class RestTimerUseCases:
         # меняем статус таймера на "отдых"
         rest_timer.status = enums.RestTimerStatuses.rest
         # рассчитываем время окончания отдыха
-        rest_timer.end_rest_time = self._get_end_rest_time(
-            rest_time_seconds=rest_timer.settings.rest_time_seconds,
+        rest_timer.end_event_time = self._get_end_event_time(
+            time_seconds=rest_timer.settings.rest_time_seconds,
         )
         self.timer_repo.save_rest_timer(rest_timer=rest_timer)
         self.logger.debug(
             'Rest is started, it will end at %s',
-            rest_timer.end_rest_time,
+            rest_timer.end_event_time,
         )
 
     def start_timer(self):
@@ -72,8 +67,8 @@ class RestTimerUseCases:
             status=enums.RestTimerStatuses.work,
         )
 
-        rest_timer.end_work_time = self._get_end_work_time(
-            work_time_seconds=rest_timer.settings.work_time_seconds
+        rest_timer.end_event_time = self._get_end_event_time(
+            time_seconds=rest_timer.settings.work_time_seconds
         )
         self.timer_repo.save_rest_timer(rest_timer)
 
@@ -81,7 +76,7 @@ class RestTimerUseCases:
         self.start_work_signal.emit()
         self.logger.debug(
             'Work is started, it will end at %s',
-            rest_timer.end_work_time,
+            rest_timer.end_event_time,
         )
 
         while True:
@@ -94,12 +89,12 @@ class RestTimerUseCases:
             time_now = datetime.now()
 
             if rest_timer.status == enums.RestTimerStatuses.work:
-                if rest_timer.end_work_time <= time_now:
+                if rest_timer.end_event_time <= time_now:
                     # запускаем отдых
                     self._start_rest(rest_timer=rest_timer)
 
             elif rest_timer.status == enums.RestTimerStatuses.rest:
-                if rest_timer.end_rest_time <= time_now:
+                if rest_timer.end_event_time <= time_now:
                     # запускаем работу
                     self._start_work(rest_timer=rest_timer)
 
@@ -114,8 +109,8 @@ class RestTimerUseCases:
         rest_timer = self.timer_repo.get_rest_timer()
 
         rest_timer.status = enums.RestTimerStatuses.work
-        rest_timer.end_work_time = self._get_end_work_time(
-            work_time_seconds=for_seconds
+        rest_timer.end_event_time = self._get_end_event_time(
+            time_seconds=for_seconds
         )
 
         self.timer_repo.save_rest_timer(rest_timer)
@@ -153,8 +148,7 @@ class RestTimerUseCases:
         rest_timer = self.timer_repo.get_rest_timer()
 
         rest_timer.status = enums.RestTimerStatuses.stop
-        rest_timer.end_work_time = None
-        rest_timer.end_rest_time = None
+        rest_timer.end_event_time = None
 
         self.timer_repo.save_rest_timer(rest_timer)
 

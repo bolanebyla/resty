@@ -15,8 +15,6 @@ class RestTimerSettings:
 
 @attr.dataclass
 class RestTimer:
-
     status: enums.RestTimerStatuses
     settings: RestTimerSettings = attr.field(factory=RestTimerSettings)
-    end_rest_time: Optional[datetime] = None
-    end_work_time: Optional[datetime] = None
+    end_event_time: Optional[datetime] = None
