@@ -1,4 +1,5 @@
 import logging
+import sys
 
 from PyQt6 import uic
 from PyQt6.QtCore import QThreadPool
@@ -68,6 +69,7 @@ class RestWindow(QMainWindow):
         stop_action.triggered.connect(self.stop)
 
         exit_action = QAction('Exit', self)
+        exit_action.triggered.connect(self.exit)
 
         menu.addAction(rest_now_action)
         menu.addAction(start_action)
@@ -119,3 +121,9 @@ class RestWindow(QMainWindow):
     def start(self):
         self.logger.debug('"start" btn is pressed')
         self.rest_timer_use_cases.start()
+
+    def exit(self):
+        self.logger.debug('"exit" btn is pressed')
+        self.rest_timer_use_cases.exit()
+        self.close()
+        sys.exit()

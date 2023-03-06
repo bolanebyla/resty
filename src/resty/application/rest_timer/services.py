@@ -84,6 +84,9 @@ class RestTimerUseCases:
             rest_timer = self.timer_repo.get_rest_timer()
             self.logger.debug('Timer status: %s', rest_timer.status.value)
 
+            if rest_timer.status == enums.RestTimerStatuses.exit:
+                return
+
             time_now = datetime.now()
 
             if rest_timer.status == enums.RestTimerStatuses.work:
@@ -157,3 +160,11 @@ class RestTimerUseCases:
         """
         rest_timer = self.timer_repo.get_rest_timer()
         self._start_work(rest_timer=rest_timer)
+
+    def exit(self):
+        """
+        Выключить таймер
+        """
+        rest_timer = self.timer_repo.get_rest_timer()
+        rest_timer.status = enums.RestTimerStatuses.exit
+        self.timer_repo.save_rest_timer(rest_timer)
