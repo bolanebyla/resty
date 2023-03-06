@@ -1,6 +1,4 @@
 from abc import ABC, abstractmethod
-from datetime import datetime
-from typing import Optional
 
 from . import entities, enums
 
@@ -10,8 +8,6 @@ class ITimerRepo(ABC):
     def create_rest_timer(
             self,
             status: enums.RestTimerStatuses,
-            end_rest_time: Optional[datetime] = None,
-            end_work_time: Optional[datetime] = None,
     ) -> entities.RestTimer:
         ...
 

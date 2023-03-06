@@ -19,16 +19,12 @@ class RestTimerUseCases:
         self.logger = logging.getLogger(self.__class__.__name__)
 
     @staticmethod
-    def _get_end_rest_time(
-            rest_time_seconds: Union[float, int] = 10
-    ) -> datetime:
+    def _get_end_rest_time(rest_time_seconds: entities.SecondsType) -> datetime:
         end_rest_time = datetime.now() + timedelta(seconds=rest_time_seconds)
         return end_rest_time
 
     @staticmethod
-    def _get_end_work_time(
-            work_time_seconds: Union[float, int] = 5
-    ) -> datetime:
+    def _get_end_work_time(work_time_seconds: entities.SecondsType) -> datetime:
         end_rest_time = datetime.now() + timedelta(seconds=work_time_seconds)
         return end_rest_time
 
@@ -42,7 +38,9 @@ class RestTimerUseCases:
         # меняем статус таймера на "работу"
         rest_timer.status = enums.RestTimerStatuses.work
         # рассчитываем время окончания работы
-        rest_timer.end_work_time = self._get_end_work_time()
+        rest_timer.end_work_time = self._get_end_work_time(
+            work_time_seconds=rest_timer.settings.work_time_seconds
+        )
         self.timer_repo.save_rest_timer(rest_timer=rest_timer)
         self.logger.debug(
             'Work is started, it will end at %s',
@@ -59,7 +57,9 @@ class RestTimerUseCases:
         # меняем статус таймера на "отдых"
         rest_timer.status = enums.RestTimerStatuses.rest
         # рассчитываем время окончания отдыха
-        rest_timer.end_rest_time = self._get_end_rest_time()
+        rest_timer.end_rest_time = self._get_end_rest_time(
+            rest_time_seconds=rest_timer.settings.rest_time_seconds,
+        )
         self.timer_repo.save_rest_timer(rest_timer=rest_timer)
         self.logger.debug(
             'Rest is started, it will end at %s',
@@ -69,9 +69,13 @@ class RestTimerUseCases:
     def start_timer(self):
         # создаем таймер со статусом "работа"
         rest_timer = self.timer_repo.create_rest_timer(
-            end_work_time=self._get_end_work_time(),
-            status=enums.RestTimerStatuses.work
+            status=enums.RestTimerStatuses.work,
         )
+
+        rest_timer.end_work_time = self._get_end_work_time(
+            work_time_seconds=rest_timer.settings.work_time_seconds
+        )
+        self.timer_repo.save_rest_timer(rest_timer)
 
         # отправляем сигнал о начале работы
         self.start_work_signal.emit()
