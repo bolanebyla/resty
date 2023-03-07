@@ -2,7 +2,7 @@ import logging
 import sys
 
 from PyQt6 import uic
-from PyQt6.QtCore import QThreadPool
+from PyQt6.QtCore import QThreadPool, Qt
 from PyQt6.QtGui import QAction, QIcon
 from PyQt6.QtWidgets import QMainWindow, QSystemTrayIcon, QMenu
 from classic.components import component
@@ -48,7 +48,12 @@ class RestWindow(QMainWindow):
             self.ui = design.Ui_MainWindow()
             self.ui.setupUi(self)
         except ImportError:
-            self.ui = uic.loadUi('resty/adapters/qt/ui/design.ui', self)
+            self.ui = uic.loadUi(
+                'resty/adapters/qt/ui/rest_window/rest_window.ui', self
+            )
+
+        # убираем рамку вокруг формы
+        self.setWindowFlags(Qt.WindowType.FramelessWindowHint)
 
     def _init_tray(self):
         icon = QIcon('resty/adapters/qt/ui/icon.png')
