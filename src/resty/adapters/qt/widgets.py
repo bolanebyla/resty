@@ -59,7 +59,6 @@ class RestWindow(QMainWindow):
             | Qt.WindowType.FramelessWindowHint  # убираем рамку вокруг формы
         )
 
-
     def _init_tray(self):
         icon = QIcon('resty/adapters/qt/ui/icon.png')
 
