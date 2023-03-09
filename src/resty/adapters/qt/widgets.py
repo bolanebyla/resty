@@ -52,11 +52,13 @@ class RestWindow(QMainWindow):
                 'resty/adapters/qt/ui/rest_window/rest_window.ui', self
             )
 
-        # убираем рамку вокруг формы
-        self.setWindowFlags(Qt.WindowType.FramelessWindowHint)
+        # устанавливаем флаги формы
+        self.setWindowFlags(
+            Qt.WindowType.Tool  # скрываем иконку с панели задач
+            | Qt.WindowType.WindowStaysOnTopHint  # открывать поверх всех окон
+            | Qt.WindowType.FramelessWindowHint  # убираем рамку вокруг формы
+        )
 
-        # скрываем иконку с панели задач
-        self.setWindowFlags(Qt.WindowType.Tool)
 
     def _init_tray(self):
         icon = QIcon('resty/adapters/qt/ui/icon.png')
