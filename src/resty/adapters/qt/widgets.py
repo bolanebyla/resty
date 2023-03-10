@@ -1,15 +1,21 @@
 import logging
+import math
 import sys
+from datetime import datetime
 
 from PyQt6 import uic
-from PyQt6.QtCore import QThreadPool, Qt
+from PyQt6.QtCore import QThreadPool, Qt, QTimer
 from PyQt6.QtGui import QAction, QIcon
 from PyQt6.QtWidgets import QMainWindow, QSystemTrayIcon, QMenu
 from classic.components import component
 
 from resty.adapters.qt.handlers import Worker
 
-from resty.application.rest_timer import RestTimerUseCases
+from resty.application.rest_timer import (
+    RestTimerUseCases,
+    RestTimerStatuses,
+    RestTimerNotFound,
+)
 
 from . import signals
 
@@ -41,6 +47,9 @@ class RestWindow(QMainWindow):
         worker = Worker(self.rest_timer_use_cases.start_timer)
         self.threadpool.start(worker)
 
+        # обновляем tooltip со статусом таймера
+        self.show_rest_timer_status_tooltip()
+
     def _init_ui(self):
         try:
             from .ui import design
@@ -62,9 +71,9 @@ class RestWindow(QMainWindow):
     def _init_tray(self):
         icon = QIcon('resty/adapters/qt/ui/icon.png')
 
-        tray = QSystemTrayIcon(self)
-        tray.setIcon(icon)
-        tray.setVisible(True)
+        self.tray = QSystemTrayIcon(self)
+        self.tray.setIcon(icon)
+        self.tray.setVisible(True)
 
         menu = QMenu()
 
@@ -72,10 +81,10 @@ class RestWindow(QMainWindow):
         rest_now_action.triggered.connect(self.rest_now)
 
         start_action = QAction('Start', self)
-        start_action.triggered.connect(self.start)
+        start_action.triggered.connect(self.start_rest_timer)
 
         stop_action = QAction('Stop', self)
-        stop_action.triggered.connect(self.stop)
+        stop_action.triggered.connect(self.stop_rest_timer)
 
         exit_action = QAction('Exit', self)
         exit_action.triggered.connect(self.exit)
@@ -85,8 +94,14 @@ class RestWindow(QMainWindow):
         menu.addAction(stop_action)
         menu.addAction(exit_action)
 
-        tray.setContextMenu(menu)
-        tray.show()
+        self.tray.setContextMenu(menu)
+        self.tray.show()
+
+        tray_timer = QTimer(self)
+        # обновляем время до перерыва
+        tray_timer.timeout.connect(self.show_rest_timer_status_tooltip)
+        # каждый 30 секунд
+        tray_timer.start(1000)
 
     def _register_signals(self):
         self.start_work_signal.signal.connect(self.start_work)
@@ -122,17 +137,63 @@ class RestWindow(QMainWindow):
         self.logger.debug('"rest_now" btn is pressed')
         self.rest_timer_use_cases.rest_now()
 
-    def stop(self):
+    def stop_rest_timer(self):
+        """
+        Остановить таймер
+        """
         self.logger.debug('"stop" btn is pressed')
         self.hide()
         self.rest_timer_use_cases.stop()
 
-    def start(self):
+    def start_rest_timer(self):
+        """
+        Запустить таймер
+        """
         self.logger.debug('"start" btn is pressed')
         self.rest_timer_use_cases.start()
 
     def exit(self):
+        """
+        Выйти из приложения (закрыть)
+        """
         self.logger.debug('"exit" btn is pressed')
         self.rest_timer_use_cases.exit()
         self.close()
         sys.exit()
+
+    def show_rest_timer_status_tooltip(self):
+        """
+        Вывести подсказку с состоянием таймера
+        """
+        try:
+            rest_timer = self.rest_timer_use_cases.get_rest_timer()
+        except RestTimerNotFound:
+            self.logger.warning(
+                'RestTimer not found for showing next rest time tooltip'
+            )
+            return
+
+        tool_tip_title = 'Resty'
+        tool_tip_message = ''
+
+        # если сейчас работа, выводим время до перерыва
+        if rest_timer.status == RestTimerStatuses.work:
+            # определяем сколько времени осталось до следующего перерыва
+            next_break_time = rest_timer.end_event_time - datetime.now()
+
+            # переводим оставшееся время в минуты (округляем в большую сторону)
+            next_break_time_minutes = math.ceil(
+                next_break_time.total_seconds() / 60
+            )
+            tool_tip_message = (f'{next_break_time_minutes} '
+                                f'minutes to next break time')
+
+        elif rest_timer.status == RestTimerStatuses.rest:
+            tool_tip_message = 'Resting...'
+
+        elif rest_timer.status == RestTimerStatuses.stop:
+            tool_tip_message = 'Stopped'
+
+        tool_tip_text = f'{tool_tip_title}\n{tool_tip_message}'
+
+        self.tray.setToolTip(tool_tip_text)

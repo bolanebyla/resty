@@ -5,7 +5,7 @@ from typing import Union
 
 from classic.components import component
 
-from . import interfaces, enums, entities
+from . import interfaces, enums, entities, errors
 
 
 @component
@@ -166,3 +166,14 @@ class RestTimerUseCases:
         rest_timer = self.timer_repo.get_rest_timer()
         rest_timer.status = enums.RestTimerStatuses.exit
         self.timer_repo.save_rest_timer(rest_timer)
+
+    def get_rest_timer(self) -> entities.RestTimer:
+        """
+        Получить RestTimer
+        """
+        rest_timer = self.timer_repo.get_rest_timer()
+
+        if rest_timer is None:
+            raise errors.RestTimerNotFound()
+
+        return rest_timer

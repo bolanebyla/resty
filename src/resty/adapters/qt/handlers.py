@@ -3,8 +3,6 @@ import traceback
 
 from PyQt6.QtCore import QObject, pyqtSignal, QRunnable, pyqtSlot
 
-from resty.application.rest_timer import errors
-
 
 class WorkerSignals(QObject):
     """
@@ -62,8 +60,6 @@ class Worker(QRunnable):
         # Retrieve args/kwargs here; and fire processing using them
         try:
             result = self.fn(*self.args, **self.kwargs)
-        except errors.TimerCanceled:
-            pass
         except Exception:
             traceback.print_exc()
             exctype, value = sys.exc_info()[:2]
