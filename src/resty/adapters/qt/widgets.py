@@ -2,6 +2,7 @@ import logging
 import math
 import sys
 from datetime import datetime
+from random import choice
 
 from PyQt6 import uic
 from PyQt6.QtCore import QThreadPool, Qt, QTimer
@@ -18,6 +19,28 @@ from resty.application.rest_timer import (
 )
 
 from . import signals
+
+# TODO: перенести в слой приложения и создать сущность
+rest_message_texts = [
+    'Прежде чем осуждать кого-то, возьми его обувь и пройди его путь, '
+    'попробуй его слезы, почувствуй его боли. Наткнись на каждый камень, '
+    'о который он споткнулся. И только после этого говори ему, '
+    'что ты знаешь, как правильно жить. Далай-Лама',
+
+    'Есть вещи на которые ты можешь повлиять. '
+    'Есть вещи, на которые ты повлиять не в силах. '
+    'Сконцентрируйся на первых и оставь вторые. Стоицизм',
+
+    'Все, что есть в этом мире, ты получаешь во временное пользование. '
+    'Либо эта вещь или человек пропадут из твоей жизни, либо ты уйдешь сам. '
+    'Не держись за предметы, всё, '
+    'что у тебя есть, это твое достоинство. Стоицизм',
+
+    'Человека определяют не атрибуты, а поступки. Стоицизм',
+
+    'Иногда самые отвратительные проблемы разбивает в прах '
+    'маленькая порция юмора. Далай-Лама'
+]
 
 
 @component
@@ -52,9 +75,9 @@ class RestWindow(QMainWindow):
 
     def _init_ui(self):
         try:
-            from .ui import design
+            from .ui.rest_window import rest_window
 
-            self.ui = design.Ui_MainWindow()
+            self.ui = rest_window.Ui_MainWindow()
             self.ui.setupUi(self)
         except ImportError:
             self.ui = uic.loadUi(
@@ -67,6 +90,9 @@ class RestWindow(QMainWindow):
             | Qt.WindowType.WindowStaysOnTopHint  # открывать поверх всех окон
             | Qt.WindowType.FramelessWindowHint  # убираем рамку вокруг формы
         )
+
+        # включаем перенос строк
+        self.ui.lbl_rest_message_text.setWordWrap(True)
 
     def _init_tray(self):
         icon = QIcon('resty/adapters/qt/ui/icon.png')
@@ -119,6 +145,7 @@ class RestWindow(QMainWindow):
 
     def start_rest(self):
         self.logger.debug('Start rest signal')
+        self.ui.lbl_rest_message_text.setText(choice(rest_message_texts))
         self.show()
 
     def move_rest_by_5_min(self):
