@@ -96,6 +96,9 @@ class RestWindow(QMainWindow):
         # включаем перенос строк
         self.ui.lbl_rest_message_text.setWordWrap(True)
 
+        self.rest_progress_timer = QTimer(self)
+        self.rest_progress_timer.timeout.connect(self.update_rest_progress_bar)
+
     def _init_tray(self):
         icon = QIcon('resty/adapters/qt/ui/icon.png')
 
@@ -144,10 +147,13 @@ class RestWindow(QMainWindow):
     def start_work(self):
         self.logger.debug('Start work signal')
         self.hide()
+        self.rest_progress_timer.stop()
 
     def start_rest(self):
         self.logger.debug('Start rest signal')
         self.ui.lbl_rest_message_text.setText(choice(rest_message_texts))
+        self.ui.rest_progress_bar.setValue(100)
+        self.rest_progress_timer.start(300)
         self.show()
 
     def move_rest_by_5_min(self):
@@ -224,3 +230,19 @@ class RestWindow(QMainWindow):
         tool_tip_text = f'{tool_tip_title}\n{tool_tip_message}'
 
         self.tray.setToolTip(tool_tip_text)
+
+    def update_rest_progress_bar(self):
+        try:
+            rest_timer = self.rest_timer_use_cases.get_rest_timer()
+        except RestTimerNotFound as e:
+            self.logger.warning(e.message)
+            return
+
+        rest_time_seconds = rest_timer.settings.rest_time_seconds
+        rest_time_end_after_seconds = (
+                rest_timer.end_event_time - datetime.now()
+        ).total_seconds()
+
+        progress = rest_time_end_after_seconds / rest_time_seconds * 100
+
+        self.ui.rest_progress_bar.setValue(progress)

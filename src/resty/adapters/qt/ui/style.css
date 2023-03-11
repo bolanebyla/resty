@@ -2,3 +2,7 @@
     font-size: 22px;
     padding: 100px;
 }}
+
+#rest_progress_bar{{
+    margin: 0 20px 50px 20px;
+}}
