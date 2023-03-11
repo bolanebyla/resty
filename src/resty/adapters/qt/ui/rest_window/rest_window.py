@@ -25,7 +25,7 @@ class Ui_MainWindow(object):
         self.verticalLayout_2.setObjectName("verticalLayout_2")
         self.lbl_rest_message_text = QtWidgets.QLabel(parent=self.centralwidget)
         font = QtGui.QFont()
-        font.setPointSize(24)
+        font.setPointSize(26)
         self.lbl_rest_message_text.setFont(font)
         self.lbl_rest_message_text.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.PreventContextMenu)
         self.lbl_rest_message_text.setFrameShadow(QtWidgets.QFrame.Shadow.Plain)
@@ -60,9 +60,6 @@ class Ui_MainWindow(object):
         self.horizontalLayout_5.addWidget(self.btn_finish_rest)
         self.verticalLayout_2.addLayout(self.horizontalLayout_5)
         MainWindow.setCentralWidget(self.centralwidget)
-        self.statusbar = QtWidgets.QStatusBar(parent=MainWindow)
-        self.statusbar.setObjectName("statusbar")
-        MainWindow.setStatusBar(self.statusbar)
 
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)

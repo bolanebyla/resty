@@ -69,6 +69,7 @@ class RestWindow(QMainWindow):
         # запускаем поток сервиса с таймером
         worker = Worker(self.rest_timer_use_cases.start_timer)
         self.threadpool.start(worker)
+        self.logger.info('Rest timer is started')
 
         # обновляем tooltip со статусом таймера
         self.show_rest_timer_status_tooltip()
@@ -79,7 +80,8 @@ class RestWindow(QMainWindow):
 
             self.ui = rest_window.Ui_MainWindow()
             self.ui.setupUi(self)
-        except ImportError:
+        except ImportError as e:
+            self.logger.warning('Can\'t import python ui: %s', e)
             self.ui = uic.loadUi(
                 'resty/adapters/qt/ui/rest_window/rest_window.ui', self
             )
@@ -195,31 +197,29 @@ class RestWindow(QMainWindow):
         try:
             rest_timer = self.rest_timer_use_cases.get_rest_timer()
         except RestTimerNotFound:
-            self.logger.warning(
-                'RestTimer not found for showing next rest time tooltip'
-            )
-            return
+            rest_timer = None
 
         tool_tip_title = 'Resty'
         tool_tip_message = ''
 
-        # если сейчас работа, выводим время до перерыва
-        if rest_timer.status == RestTimerStatuses.work:
-            # определяем сколько времени осталось до следующего перерыва
-            next_break_time = rest_timer.end_event_time - datetime.now()
+        if rest_timer is not None:
+            # если сейчас работа, выводим время до перерыва
+            if rest_timer.status == RestTimerStatuses.work:
+                # определяем сколько времени осталось до следующего перерыва
+                next_break_time = rest_timer.end_event_time - datetime.now()
 
-            # переводим оставшееся время в минуты (округляем в большую сторону)
-            next_break_time_minutes = math.ceil(
-                next_break_time.total_seconds() / 60
-            )
-            tool_tip_message = (f'{next_break_time_minutes} '
-                                f'minutes to next break time')
+                # переводим оставшееся время в минуты (округляем в большую сторону)
+                next_break_time_minutes = math.ceil(
+                    next_break_time.total_seconds() / 60
+                )
+                tool_tip_message = (f'{next_break_time_minutes} '
+                                    f'minutes to next break time')
 
-        elif rest_timer.status == RestTimerStatuses.rest:
-            tool_tip_message = 'Resting...'
+            elif rest_timer.status == RestTimerStatuses.rest:
+                tool_tip_message = 'Resting...'
 
-        elif rest_timer.status == RestTimerStatuses.stop:
-            tool_tip_message = 'Stopped'
+            elif rest_timer.status == RestTimerStatuses.stop:
+                tool_tip_message = 'Stopped'
 
         tool_tip_text = f'{tool_tip_title}\n{tool_tip_message}'
 
