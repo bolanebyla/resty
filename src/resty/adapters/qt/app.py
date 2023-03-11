@@ -2,6 +2,8 @@ from PyQt6.QtWidgets import QApplication, QWidget
 
 import sys
 
+from qt_material import apply_stylesheet
+
 from resty.application import rest_timer
 
 from . import widgets, signals
@@ -25,6 +27,10 @@ def create_app(
     app = App(sys.argv)
 
     app.setQuitOnLastWindowClosed(False)
+
+    # setup stylesheet
+    apply_stylesheet(app, theme='light_blue_500.xml', invert_secondary=True,
+                     css_file='resty/adapters/qt/ui/style.css')
 
     app.register_widget(
         widgets.RestWindow(
