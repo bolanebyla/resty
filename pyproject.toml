@@ -11,7 +11,7 @@ requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = ">=3.9,<3.10"
 PyQt6 = "^6.4.2"
 python-json-logger = "^2.0.4"
 attrs = "21.4"
@@ -27,6 +27,7 @@ flake8 = "^6.0.0"
 toml = "^0.10.2"
 flake8-pyproject = "^1.2.2"
 pre-commit = "^3.1.1"
+pyinstaller = "^5.8.0"
 
 [tool.isort]
 profile = "black"
