@@ -3,7 +3,6 @@ from pydantic import BaseSettings
 
 class Settings(BaseSettings):
     LOGGING_LEVEL: str = 'INFO'
-    LOGGING_JSON: bool = True
 
     @property
     def LOGGING_CONFIG(self):
@@ -18,16 +17,11 @@ class Settings(BaseSettings):
                     'format': fmt,
                     'datefmt': datefmt,
                 },
-                'json': {
-                    'format': fmt,
-                    'datefmt': datefmt,
-                    'class': 'pythonjsonlogger.jsonlogger.JsonFormatter'
-                },
             },
             'handlers': {
                 'default': {
                     'level': self.LOGGING_LEVEL,
-                    'formatter': 'json' if self.LOGGING_JSON else 'default',
+                    'formatter': 'default',
                     'class': 'logging.StreamHandler',
                     'stream': 'ext://sys.stdout',
                 },
