@@ -1,5 +1,5 @@
-from .services import RestTimerUseCases
-from .entities import RestTimerSettings, RestTimer
+from .entities import RestTimer, RestTimerSettings
 from .enums import RestTimerStatuses
-from .interfaces import ISignal, ITimerRepo
 from .errors import RestTimerNotFound
+from .interfaces import ISignal, ITimerRepo
+from .services import RestTimerUseCases

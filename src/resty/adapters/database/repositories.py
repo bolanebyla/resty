@@ -16,13 +16,11 @@ class TimerRepo(ITimerRepo):
         self.mutex = QMutex()
 
     def create_rest_timer(
-            self,
-            status: RestTimerStatuses,
+        self,
+        status: RestTimerStatuses,
     ) -> RestTimer:
         if self._rest_timer is None:
-            self._rest_timer = RestTimer(
-                status=status,
-            )
+            self._rest_timer = RestTimer(status=status)
 
         return copy.deepcopy(self._rest_timer)
 

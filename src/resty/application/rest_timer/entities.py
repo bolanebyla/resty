@@ -2,6 +2,7 @@ from datetime import datetime
 from typing import Optional, Union
 
 import attr
+
 from . import enums
 
 SecondsType = Union[float, int]

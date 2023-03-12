@@ -4,10 +4,11 @@ from . import entities, enums
 
 
 class ITimerRepo(ABC):
+
     @abstractmethod
     def create_rest_timer(
-            self,
-            status: enums.RestTimerStatuses,
+        self,
+        status: enums.RestTimerStatuses,
     ) -> entities.RestTimer:
         ...
 
@@ -17,12 +18,13 @@ class ITimerRepo(ABC):
 
     @abstractmethod
     def save_rest_timer(
-            self, rest_timer: entities.RestTimer
+        self, rest_timer: entities.RestTimer
     ) -> entities.RestTimer:
         ...
 
 
 class ITimerEvents(ABC):
+
     @abstractmethod
     def start_rest(self):
         ...
@@ -33,6 +35,7 @@ class ITimerEvents(ABC):
 
 
 class ISignal(ABC):
+
     @abstractmethod
     def emit(self):
         ...

@@ -1,12 +1,11 @@
-from PyQt6.QtWidgets import QApplication, QWidget
-
 import sys
 
+from PyQt6.QtWidgets import QApplication, QWidget
 from qt_material import apply_stylesheet
 
 from resty.application import rest_timer
 
-from . import widgets, signals
+from . import signals, widgets
 
 
 class App(QApplication):
@@ -20,17 +19,21 @@ class App(QApplication):
 
 
 def create_app(
-        rest_timer_use_cases: rest_timer.RestTimerUseCases,
-        start_work_signal: signals.StartWorkSignal,
-        start_rest_signal: signals.StartRestSignal,
+    rest_timer_use_cases: rest_timer.RestTimerUseCases,
+    start_work_signal: signals.StartWorkSignal,
+    start_rest_signal: signals.StartRestSignal,
 ):
     app = App(sys.argv)
 
     app.setQuitOnLastWindowClosed(False)
 
     # setup stylesheet
-    apply_stylesheet(app, theme='light_blue_500.xml', invert_secondary=True,
-                     css_file='resty/adapters/qt/ui/style.css')
+    apply_stylesheet(
+        app,
+        theme='light_blue_500.xml',
+        invert_secondary=True,
+        css_file='resty/adapters/qt/ui/style.css'
+    )
 
     app.register_widget(
         widgets.RestWindow(

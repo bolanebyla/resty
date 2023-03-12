@@ -1,4 +1,4 @@
-from resty.adapters import qt, database, log
+from resty.adapters import database, log, qt
 from resty.application import rest_timer
 
 

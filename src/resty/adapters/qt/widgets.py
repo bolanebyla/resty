@@ -4,18 +4,17 @@ import sys
 from datetime import datetime
 from random import choice
 
-from PyQt6 import uic, QtGui
-from PyQt6.QtCore import QThreadPool, Qt, QTimer
-from PyQt6.QtGui import QAction, QIcon
-from PyQt6.QtWidgets import QMainWindow, QSystemTrayIcon, QMenu
 from classic.components import component
+from PyQt6 import QtGui, uic
+from PyQt6.QtCore import Qt, QThreadPool, QTimer
+from PyQt6.QtGui import QAction, QIcon
+from PyQt6.QtWidgets import QMainWindow, QMenu, QSystemTrayIcon
 
 from resty.adapters.qt.handlers import Worker
-
 from resty.application.rest_timer import (
-    RestTimerUseCases,
-    RestTimerStatuses,
     RestTimerNotFound,
+    RestTimerStatuses,
+    RestTimerUseCases,
 )
 
 from . import signals
@@ -26,18 +25,14 @@ rest_message_texts = [
     'попробуй его слезы, почувствуй его боли. Наткнись на каждый камень, '
     'о который он споткнулся. И только после этого говори ему, '
     'что ты знаешь, как правильно жить. Далай-Лама',
-
     'Есть вещи на которые ты можешь повлиять. '
     'Есть вещи, на которые ты повлиять не в силах. '
     'Сконцентрируйся на первых и оставь вторые. Стоицизм',
-
     'Все, что есть в этом мире, ты получаешь во временное пользование. '
     'Либо эта вещь или человек пропадут из твоей жизни, либо ты уйдешь сам. '
     'Не держись за предметы, всё, '
     'что у тебя есть, это твое достоинство. Стоицизм',
-
     'Человека определяют не атрибуты, а поступки. Стоицизм',
-
     'Иногда самые отвратительные проблемы разбивает в прах '
     'маленькая порция юмора. Далай-Лама'
 ]
@@ -90,9 +85,9 @@ class RestWindow(QMainWindow):
 
         # устанавливаем флаги формы
         self.setWindowFlags(
-            Qt.WindowType.Tool  # скрываем иконку с панели задач
-            | Qt.WindowType.WindowStaysOnTopHint  # открывать поверх всех окон
-            | Qt.WindowType.FramelessWindowHint  # убираем рамку вокруг формы
+            Qt.WindowType.Tool    # скрываем иконку с панели задач
+            | Qt.WindowType.WindowStaysOnTopHint    # открывать поверх всех окон
+            | Qt.WindowType.FramelessWindowHint    # убираем рамку вокруг формы
         )
 
         # включаем перенос строк
@@ -230,12 +225,15 @@ class RestWindow(QMainWindow):
                 # определяем сколько времени осталось до следующего перерыва
                 next_break_time = rest_timer.end_event_time - datetime.now()
 
-                # переводим оставшееся время в минуты (округляем в большую сторону)
+                # переводим оставшееся время в минуты
+                # (округляем в большую сторону)
                 next_break_time_minutes = math.ceil(
                     next_break_time.total_seconds() / 60
                 )
-                tool_tip_message = (f'{next_break_time_minutes} '
-                                    f'minutes to next break time')
+                tool_tip_message = (
+                    f'{next_break_time_minutes} '
+                    f'minutes to next break time'
+                )
 
             elif rest_timer.status == RestTimerStatuses.rest:
                 tool_tip_message = 'Resting...'
@@ -256,7 +254,7 @@ class RestWindow(QMainWindow):
 
         rest_time_seconds = rest_timer.settings.rest_time_seconds
         rest_time_end_after_seconds = (
-                rest_timer.end_event_time - datetime.now()
+            rest_timer.end_event_time - datetime.now()
         ).total_seconds()
 
         progress = rest_time_end_after_seconds / rest_time_seconds * 100

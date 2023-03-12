@@ -5,7 +5,7 @@ from typing import Union
 
 from classic.components import component
 
-from . import interfaces, enums, entities, errors
+from . import entities, enums, errors, interfaces
 
 
 @component

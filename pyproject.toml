@@ -6,6 +6,10 @@ authors = ["Alex Leskov <alexleskov2000@gmail.com>"]
 license = "MIT License"
 readme = "README.md"
 
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
 [tool.poetry.dependencies]
 python = "^3.9"
 PyQt6 = "^6.4.2"
@@ -16,7 +20,44 @@ pydantic = ">=1.8.2,<1.9.0"
 classic-app-layer = "^0.0.1"
 qt-material = "^2.14"
 
+[tool.poetry.group.dev.dependencies]
+isort = "^5.12.0"
+yapf = "^0.32.0"
+flake8 = "^6.0.0"
+toml = "^0.10.2"
+flake8-pyproject = "^1.2.2"
+pre-commit = "^3.1.1"
 
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+[tool.isort]
+profile = "black"
+known_first_party = "resty"
+line_length = 80
+
+[tool.yapf]
+based_on_style = "pep8"
+spaces_before_comment = 4
+column_limit = 80
+allow_split_before_dict_value = false
+dedent_closing_brackets = true
+split_complex_comprehension = true
+split_arguments_when_comma_terminated = true
+blank_line_before_nested_class_or_def = true
+split_before_dict_set_generator = true
+split_before_first_argument = true
+split_before_arithmetic_operator = true
+split_before_logical_operator = true
+split_before_bitwise_operator = true
+
+[tool.flake8]
+max-line-length = 80
+select = ['F', 'E', 'W', ]
+ignore = ['W503', ]
+
+per-file-ignores = [
+    '*/adapters/*/repositories.py:E711,E712',
+    '*/adapters/*/repositories/*:E711,E712',
+    '*/migrations/*:E711,E712',
+    '*/alembic/versions/*:E711,E712',
+    '__init__.py:F401',
+]
+count = true
