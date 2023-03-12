@@ -63,6 +63,13 @@ class Ui_MainWindow(object):
         self.horizontalLayout_5.setContentsMargins(200, -1, 200, 30)
         self.horizontalLayout_5.setSpacing(30)
         self.horizontalLayout_5.setObjectName("horizontalLayout_5")
+        self.btn_finish_rest = QtWidgets.QPushButton(parent=self.centralwidget)
+        self.btn_finish_rest.setMinimumSize(QtCore.QSize(0, 24))
+        font = QtGui.QFont()
+        font.setPointSize(10)
+        self.btn_finish_rest.setFont(font)
+        self.btn_finish_rest.setObjectName("btn_finish_rest")
+        self.horizontalLayout_5.addWidget(self.btn_finish_rest)
         self.btn_move_rest_by_5_min = QtWidgets.QPushButton(
             parent=self.centralwidget
         )
@@ -84,13 +91,6 @@ class Ui_MainWindow(object):
         self.btn_move_rest_by_10_min.setFont(font)
         self.btn_move_rest_by_10_min.setObjectName("btn_move_rest_by_10_min")
         self.horizontalLayout_5.addWidget(self.btn_move_rest_by_10_min)
-        self.btn_finish_rest = QtWidgets.QPushButton(parent=self.centralwidget)
-        self.btn_finish_rest.setMinimumSize(QtCore.QSize(0, 24))
-        font = QtGui.QFont()
-        font.setPointSize(10)
-        self.btn_finish_rest.setFont(font)
-        self.btn_finish_rest.setObjectName("btn_finish_rest")
-        self.horizontalLayout_5.addWidget(self.btn_finish_rest)
         self.verticalLayout_2.addLayout(self.horizontalLayout_5)
         MainWindow.setCentralWidget(self.centralwidget)
 
@@ -103,14 +103,14 @@ class Ui_MainWindow(object):
         self.lbl_rest_message_text.setText(
             _translate("MainWindow", "Time to have a break")
         )
+        self.btn_finish_rest.setText(
+            _translate("MainWindow", "Закончить перерыв")
+        )
         self.btn_move_rest_by_5_min.setText(
             _translate("MainWindow", "Отложить перерыв на 5 мин")
         )
         self.btn_move_rest_by_10_min.setText(
             _translate("MainWindow", "Отложить перерыв на 10 мин")
-        )
-        self.btn_finish_rest.setText(
-            _translate("MainWindow", "Закончить перерыв")
         )
 
 

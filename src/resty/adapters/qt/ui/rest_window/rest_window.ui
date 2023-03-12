@@ -108,6 +108,24 @@
        <number>30</number>
       </property>
       <item>
+       <widget class="QPushButton" name="btn_finish_rest">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>24</height>
+         </size>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>10</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Закончить перерыв</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QPushButton" name="btn_move_rest_by_5_min">
         <property name="minimumSize">
          <size>
@@ -146,24 +164,6 @@
         </property>
         <property name="text">
          <string>Отложить перерыв на 10 мин</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="btn_finish_rest">
-        <property name="minimumSize">
-         <size>
-          <width>0</width>
-          <height>24</height>
-         </size>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>10</pointsize>
-         </font>
-        </property>
-        <property name="text">
-         <string>Закончить перерыв</string>
         </property>
        </widget>
       </item>
