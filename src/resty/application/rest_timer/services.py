@@ -9,7 +9,7 @@ from . import entities, enums, errors, interfaces
 
 
 @component
-class RestTimerUseCases:
+class RestTimerService:
     timer_repo: interfaces.ITimerRepo
 
     start_work_signal: interfaces.ISignal

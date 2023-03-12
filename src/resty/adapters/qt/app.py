@@ -19,7 +19,7 @@ class App(QApplication):
 
 
 def create_app(
-    rest_timer_use_cases: rest_timer.RestTimerUseCases,
+    rest_timer_service: rest_timer.RestTimerService,
     start_work_signal: signals.StartWorkSignal,
     start_rest_signal: signals.StartRestSignal,
 ):
@@ -38,7 +38,7 @@ def create_app(
     app.register_widget(
         widgets.RestWindow(
             primary_screen=app.primaryScreen(),
-            rest_timer_use_cases=rest_timer_use_cases,
+            rest_timer_service=rest_timer_service,
             start_work_signal=start_work_signal,
             start_rest_signal=start_rest_signal,
         )

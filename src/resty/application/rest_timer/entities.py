@@ -10,8 +10,8 @@ SecondsType = Union[float, int]
 
 @attr.dataclass
 class RestTimerSettings:
-    work_time_seconds: SecondsType = 60 * 5
-    rest_time_seconds: SecondsType = 60 * 5
+    work_time_seconds: SecondsType = 40 * 60
+    rest_time_seconds: SecondsType = 10 * 60
 
 
 @attr.dataclass

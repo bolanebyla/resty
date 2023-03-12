@@ -16,7 +16,7 @@ class Signals:
 
 
 class Application:
-    rest_timer_use_cases = rest_timer.RestTimerUseCases(
+    rest_timer_service = rest_timer.RestTimerService(
         timer_repo=DB.timer_repo,
         start_work_signal=Signals.start_work_signal,
         start_rest_signal=Signals.start_rest_signal,
@@ -24,7 +24,7 @@ class Application:
 
 
 app = qt.create_app(
-    rest_timer_use_cases=Application.rest_timer_use_cases,
+    rest_timer_service=Application.rest_timer_service,
     start_work_signal=Signals.start_work_signal,
     start_rest_signal=Signals.start_rest_signal,
 )

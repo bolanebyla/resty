@@ -13,8 +13,8 @@ from PyQt6.QtWidgets import QMainWindow, QMenu, QSystemTrayIcon
 from resty.adapters.qt.handlers import Worker
 from resty.application.rest_timer import (
     RestTimerNotFound,
+    RestTimerService,
     RestTimerStatuses,
-    RestTimerUseCases,
 )
 
 from . import signals
@@ -44,7 +44,7 @@ class RestWindow(QMainWindow):
 
     primary_screen: QtGui.QScreen
 
-    rest_timer_use_cases: RestTimerUseCases
+    rest_timer_service: RestTimerService
 
     start_work_signal: signals.StartWorkSignal
     start_rest_signal: signals.StartRestSignal
@@ -64,7 +64,7 @@ class RestWindow(QMainWindow):
         self._register_signals()
 
         # запускаем поток сервиса с таймером
-        worker = Worker(self.rest_timer_use_cases.start_timer)
+        worker = Worker(self.rest_timer_service.start_timer)
         self.threadpool.start(worker)
         self.logger.info('Rest timer is started')
 
@@ -171,19 +171,19 @@ class RestWindow(QMainWindow):
 
     def move_rest_by_5_min(self):
         self.logger.debug('"move_rest_by_5_min" btn is pressed')
-        self.rest_timer_use_cases.move_rest_by_5_min()
+        self.rest_timer_service.move_rest_by_5_min()
 
     def move_rest_by_10_min(self):
         self.logger.debug('"move_rest_by_10_min" btn is pressed')
-        self.rest_timer_use_cases.move_rest_by_10_min()
+        self.rest_timer_service.move_rest_by_10_min()
 
     def finish_rest(self):
         self.logger.debug('"finish_rest" btn is pressed')
-        self.rest_timer_use_cases.finish_rest()
+        self.rest_timer_service.finish_rest()
 
     def rest_now(self):
         self.logger.debug('"rest_now" btn is pressed')
-        self.rest_timer_use_cases.rest_now()
+        self.rest_timer_service.rest_now()
 
     def stop_rest_timer(self):
         """
@@ -191,21 +191,21 @@ class RestWindow(QMainWindow):
         """
         self.logger.debug('"stop" btn is pressed')
         self.hide()
-        self.rest_timer_use_cases.stop()
+        self.rest_timer_service.stop()
 
     def start_rest_timer(self):
         """
         Запустить таймер
         """
         self.logger.debug('"start" btn is pressed')
-        self.rest_timer_use_cases.start()
+        self.rest_timer_service.start()
 
     def exit(self):
         """
         Выйти из приложения (закрыть)
         """
         self.logger.debug('"exit" btn is pressed')
-        self.rest_timer_use_cases.exit()
+        self.rest_timer_service.exit()
         self.close()
         sys.exit()
 
@@ -214,7 +214,7 @@ class RestWindow(QMainWindow):
         Вывести подсказку с состоянием таймера
         """
         try:
-            rest_timer = self.rest_timer_use_cases.get_rest_timer()
+            rest_timer = self.rest_timer_service.get_rest_timer()
         except RestTimerNotFound:
             rest_timer = None
 
@@ -252,7 +252,7 @@ class RestWindow(QMainWindow):
         Обновляет значение прогресс-бара перерыва (от 100% к 0)
         """
         try:
-            rest_timer = self.rest_timer_use_cases.get_rest_timer()
+            rest_timer = self.rest_timer_service.get_rest_timer()
         except RestTimerNotFound as e:
             self.logger.warning(e.message)
             return
@@ -269,7 +269,7 @@ class RestWindow(QMainWindow):
         Обновляет таймер оставшегося времени перерыва
         """
         try:
-            rest_timer = self.rest_timer_use_cases.get_rest_timer()
+            rest_timer = self.rest_timer_service.get_rest_timer()
         except RestTimerNotFound as e:
             self.logger.warning(e.message)
             return
