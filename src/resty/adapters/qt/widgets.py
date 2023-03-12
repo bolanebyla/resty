@@ -4,7 +4,7 @@ import sys
 from datetime import datetime
 from random import choice
 
-from PyQt6 import uic
+from PyQt6 import uic, QtGui
 from PyQt6.QtCore import QThreadPool, Qt, QTimer
 from PyQt6.QtGui import QAction, QIcon
 from PyQt6.QtWidgets import QMainWindow, QSystemTrayIcon, QMenu
@@ -46,6 +46,8 @@ rest_message_texts = [
 @component
 class RestWindow(QMainWindow):
     ui = None
+
+    primary_screen: QtGui.QScreen
 
     rest_timer_use_cases: RestTimerUseCases
 
@@ -96,8 +98,22 @@ class RestWindow(QMainWindow):
         # включаем перенос строк
         self.ui.lbl_rest_message_text.setWordWrap(True)
 
+        # таймер для прогрес бара отдыха
         self.rest_progress_timer = QTimer(self)
         self.rest_progress_timer.timeout.connect(self.update_rest_progress_bar)
+
+        # форма должна быть по центру экрана
+        self._move_window_center()
+
+        # форма должна появляться всегда на главном мониторе
+        self.setScreen(self.primary_screen)
+
+    def _move_window_center(self):
+        qr = self.frameGeometry()
+        cp = self.screen().availableGeometry().center()
+
+        qr.moveCenter(cp)
+        self.move(qr.topLeft())
 
     def _init_tray(self):
         icon = QIcon('resty/adapters/qt/ui/icon.png')

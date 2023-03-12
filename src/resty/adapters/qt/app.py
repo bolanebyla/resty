@@ -34,6 +34,7 @@ def create_app(
 
     app.register_widget(
         widgets.RestWindow(
+            primary_screen=app.primaryScreen(),
             rest_timer_use_cases=rest_timer_use_cases,
             start_work_signal=start_work_signal,
             start_rest_signal=start_rest_signal,
