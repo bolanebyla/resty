@@ -96,6 +96,9 @@ class RestWindow(QMainWindow):
         # таймер для прогрес бара отдыха
         self.rest_progress_timer = QTimer(self)
         self.rest_progress_timer.timeout.connect(self.update_rest_progress_bar)
+        self.rest_progress_timer.timeout.connect(
+            self.update_remaining_rest_time
+        )
 
         # форма должна быть по центру экрана
         self._move_window_center()
@@ -142,7 +145,6 @@ class RestWindow(QMainWindow):
         tray_timer = QTimer(self)
         # обновляем время до перерыва
         tray_timer.timeout.connect(self.show_rest_timer_status_tooltip)
-        # каждый 30 секунд
         tray_timer.start(1000)
 
     def _register_signals(self):
@@ -164,7 +166,7 @@ class RestWindow(QMainWindow):
         self.logger.debug('Start rest signal')
         self.ui.lbl_rest_message_text.setText(choice(rest_message_texts))
         self.ui.rest_progress_bar.setValue(100)
-        self.rest_progress_timer.start(300)
+        self.rest_progress_timer.start(100)
         self.show()
 
     def move_rest_by_5_min(self):
@@ -246,6 +248,9 @@ class RestWindow(QMainWindow):
         self.tray.setToolTip(tool_tip_text)
 
     def update_rest_progress_bar(self):
+        """
+        Обновляет значение прогресс-бара перерыва (от 100% к 0)
+        """
         try:
             rest_timer = self.rest_timer_use_cases.get_rest_timer()
         except RestTimerNotFound as e:
@@ -253,10 +258,25 @@ class RestWindow(QMainWindow):
             return
 
         rest_time_seconds = rest_timer.settings.rest_time_seconds
-        rest_time_end_after_seconds = (
-            rest_timer.end_event_time - datetime.now()
-        ).total_seconds()
+        remaining_rest_time = rest_timer.get_remaining_time_before_event()
 
-        progress = rest_time_end_after_seconds / rest_time_seconds * 100
+        progress = remaining_rest_time.total_seconds() / rest_time_seconds * 100
 
         self.ui.rest_progress_bar.setValue(progress)
+
+    def update_remaining_rest_time(self):
+        """
+        Обновляет таймер оставшегося времени перерыва
+        """
+        try:
+            rest_timer = self.rest_timer_use_cases.get_rest_timer()
+        except RestTimerNotFound as e:
+            self.logger.warning(e.message)
+            return
+
+        remaining_rest_time = rest_timer.get_remaining_time_before_event()
+
+        mm, ss = divmod(remaining_rest_time.seconds, 60)
+
+        self.ui.lbl_remaining_rest_time.setText(f'{mm} мин '
+                                                f'{ss} сек')

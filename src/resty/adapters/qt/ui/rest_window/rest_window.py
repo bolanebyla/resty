@@ -23,6 +23,11 @@ class Ui_MainWindow(object):
         self.centralwidget.setObjectName("centralwidget")
         self.verticalLayout_2 = QtWidgets.QVBoxLayout(self.centralwidget)
         self.verticalLayout_2.setObjectName("verticalLayout_2")
+        spacerItem = QtWidgets.QSpacerItem(
+            20, 40, QtWidgets.QSizePolicy.Policy.Minimum,
+            QtWidgets.QSizePolicy.Policy.Expanding
+        )
+        self.verticalLayout_2.addItem(spacerItem)
         self.lbl_rest_message_text = QtWidgets.QLabel(parent=self.centralwidget)
         font = QtGui.QFont()
         font.setPointSize(26)
@@ -36,6 +41,17 @@ class Ui_MainWindow(object):
         )
         self.lbl_rest_message_text.setObjectName("lbl_rest_message_text")
         self.verticalLayout_2.addWidget(self.lbl_rest_message_text)
+        spacerItem1 = QtWidgets.QSpacerItem(
+            20, 40, QtWidgets.QSizePolicy.Policy.Minimum,
+            QtWidgets.QSizePolicy.Policy.Expanding
+        )
+        self.verticalLayout_2.addItem(spacerItem1)
+        self.lbl_remaining_rest_time = QtWidgets.QLabel(
+            parent=self.centralwidget
+        )
+        self.lbl_remaining_rest_time.setText("")
+        self.lbl_remaining_rest_time.setObjectName("lbl_remaining_rest_time")
+        self.verticalLayout_2.addWidget(self.lbl_remaining_rest_time)
         self.rest_progress_bar = QtWidgets.QProgressBar(
             parent=self.centralwidget
         )
