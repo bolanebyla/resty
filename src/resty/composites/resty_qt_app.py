@@ -1,3 +1,5 @@
+import sys
+
 from resty.adapters import database, log, qt
 from resty.application import rest_timer
 
@@ -30,4 +32,4 @@ app = qt.create_app(
 )
 
 if __name__ == '__main__':
-    app.run()
+    sys.exit(app.run())

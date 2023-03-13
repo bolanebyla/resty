@@ -2,6 +2,7 @@ import logging
 import math
 import sys
 from datetime import datetime
+from pathlib import Path
 from random import choice
 
 from classic.components import component
@@ -18,6 +19,8 @@ from resty.application.rest_timer import (
 )
 
 from . import signals
+
+BASE_DIR: Path = Path(__file__).parent
 
 # TODO: перенести в слой приложения и создать сущность
 rest_message_texts = [
@@ -114,7 +117,7 @@ class RestWindow(QMainWindow):
         self.move(qr.topLeft())
 
     def _init_tray(self):
-        icon = QIcon('resty/adapters/qt/ui/icon.png')
+        icon = QIcon(str(BASE_DIR / 'resources' / 'icon.png'))
 
         self.tray = QSystemTrayIcon(self)
         self.tray.setIcon(icon)

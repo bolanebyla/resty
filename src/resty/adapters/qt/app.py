@@ -1,4 +1,5 @@
 import sys
+from pathlib import Path
 
 from PyQt6.QtWidgets import QApplication, QWidget
 from qt_material import apply_stylesheet
@@ -6,6 +7,8 @@ from qt_material import apply_stylesheet
 from resty.application import rest_timer
 
 from . import signals, widgets
+
+BASE_DIR: Path = Path(__file__).parent
 
 
 class App(QApplication):
@@ -32,7 +35,7 @@ def create_app(
         app,
         theme='light_blue_500.xml',
         invert_secondary=True,
-        css_file='resty/adapters/qt/ui/style.css'
+        css_file=str(BASE_DIR / 'resources' / 'style.css'),
     )
 
     app.register_widget(
