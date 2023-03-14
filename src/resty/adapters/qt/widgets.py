@@ -117,7 +117,9 @@ class RestWindow(QMainWindow):
         self.move(qr.topLeft())
 
     def _init_tray(self):
-        icon = QIcon(str(BASE_DIR / 'resources' / 'icon.png'))
+        icon = QIcon(
+            str(BASE_DIR / 'resources' / 'images' / 'icons' / 'tray_icon.png')
+        )
 
         self.tray = QSystemTrayIcon(self)
         self.tray.setIcon(icon)
