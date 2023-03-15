@@ -127,16 +127,16 @@ class RestWindow(QMainWindow):
 
         menu = QMenu()
 
-        rest_now_action = QAction('Rest now', self)
+        rest_now_action = QAction('Отдых', self)
         rest_now_action.triggered.connect(self.rest_now)
 
-        start_action = QAction('Start', self)
+        start_action = QAction('Перезапустить', self)
         start_action.triggered.connect(self.start_rest_timer)
 
-        stop_action = QAction('Stop', self)
+        stop_action = QAction('Остановить таймер', self)
         stop_action.triggered.connect(self.stop_rest_timer)
 
-        exit_action = QAction('Exit', self)
+        exit_action = QAction('Выход', self)
         exit_action.triggered.connect(self.exit)
 
         menu.addAction(rest_now_action)
@@ -150,7 +150,7 @@ class RestWindow(QMainWindow):
         tray_timer = QTimer(self)
         # обновляем время до перерыва
         tray_timer.timeout.connect(self.show_rest_timer_status_tooltip)
-        tray_timer.start(1000)
+        tray_timer.start(100)
 
     def _register_signals(self):
         self.start_work_signal.signal.connect(self.start_work)
@@ -239,14 +239,14 @@ class RestWindow(QMainWindow):
                 )
                 tool_tip_message = (
                     f'{next_break_time_minutes} '
-                    f'minutes to next break time'
+                    f'мин до следующего перерыва'
                 )
 
             elif rest_timer.status == RestTimerStatuses.rest:
-                tool_tip_message = 'Resting...'
+                tool_tip_message = 'Отдых...'
 
             elif rest_timer.status == RestTimerStatuses.stop:
-                tool_tip_message = 'Stopped'
+                tool_tip_message = 'Остановлен'
 
         tool_tip_text = f'{tool_tip_title}\n{tool_tip_message}'
 
