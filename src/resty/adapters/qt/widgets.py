@@ -122,6 +122,7 @@ class RestWindow(QMainWindow):
         icon = QIcon(
             str(BASE_DIR / 'resources' / 'images' / 'icons' / 'tray_icon.svg')
         )
+        assert not icon.isNull()
 
         self.tray = QSystemTrayIcon(self)
         self.tray.setIcon(icon)
