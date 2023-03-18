@@ -15,6 +15,8 @@ class RestTimerService:
     start_work_signal: interfaces.ISignal
     start_rest_signal: interfaces.ISignal
 
+    event_update_time_msec: float
+
     def __attrs_post_init__(self):
         self.logger = logging.getLogger(self.__class__.__name__)
 
@@ -98,7 +100,7 @@ class RestTimerService:
                     # запускаем работу
                     self._start_work(rest_timer=rest_timer)
 
-            time.sleep(1)
+            time.sleep(self.event_update_time_msec / 1000)
 
     def _move_rest(self, for_seconds: Union[float, int]):
         """

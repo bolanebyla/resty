@@ -52,6 +52,8 @@ class RestWindow(QMainWindow):
     start_work_signal: signals.StartWorkSignal
     start_rest_signal: signals.StartRestSignal
 
+    event_update_time_msec: float
+
     def __attrs_post_init__(self):
         super().__init__()
         self.logger = logging.getLogger(self.__class__.__name__)
@@ -150,7 +152,7 @@ class RestWindow(QMainWindow):
         tray_timer = QTimer(self)
         # обновляем время до перерыва
         tray_timer.timeout.connect(self.show_rest_timer_status_tooltip)
-        tray_timer.start(100)
+        tray_timer.start(self.event_update_time_msec)
 
     def _register_signals(self):
         self.start_work_signal.signal.connect(self.start_work)
@@ -171,7 +173,7 @@ class RestWindow(QMainWindow):
         self.logger.debug('Start rest signal')
         self.ui.lbl_rest_message_text.setText(choice(rest_message_texts))
         self.ui.rest_progress_bar.setValue(100)
-        self.rest_progress_timer.start(100)
+        self.rest_progress_timer.start(self.event_update_time_msec)
         self.show()
 
     def move_rest_by_5_min(self):
@@ -280,8 +282,9 @@ class RestWindow(QMainWindow):
             return
 
         remaining_rest_time = rest_timer.get_remaining_time_before_event()
-
         mm, ss = divmod(remaining_rest_time.seconds, 60)
 
-        self.ui.lbl_remaining_rest_time.setText(f'{mm} мин '
-                                                f'{ss} сек')
+        if mm <= 60:
+            self.ui.lbl_remaining_rest_time.setText(f'{mm} мин {ss} сек')
+        else:
+            self.ui.lbl_remaining_rest_time.setText('')

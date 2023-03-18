@@ -22,6 +22,7 @@ class App(QApplication):
 
 
 def create_app(
+    event_update_time_msec: float,
     rest_timer_service: rest_timer.RestTimerService,
     start_work_signal: signals.StartWorkSignal,
     start_rest_signal: signals.StartRestSignal,
@@ -40,6 +41,7 @@ def create_app(
 
     app.register_widget(
         widgets.RestWindow(
+            event_update_time_msec=event_update_time_msec,
             primary_screen=app.primaryScreen(),
             rest_timer_service=rest_timer_service,
             start_work_signal=start_work_signal,
