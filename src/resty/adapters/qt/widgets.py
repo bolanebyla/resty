@@ -80,7 +80,7 @@ class RestWindow(QMainWindow):
         try:
             from .ui.rest_window import rest_window
 
-            self.ui = rest_window.Ui_MainWindow()
+            self.ui = rest_window.Ui_RestWindow()
             self.ui.setupUi(self)
         except ImportError as e:
             self.logger.warning('Can\'t import python ui: %s', e)

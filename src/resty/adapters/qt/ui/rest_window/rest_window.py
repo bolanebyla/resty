@@ -8,18 +8,18 @@
 from PyQt6 import QtCore, QtGui, QtWidgets
 
 
-class Ui_MainWindow(object):
+class Ui_RestWindow(object):
 
-    def setupUi(self, MainWindow):
-        MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(1200, 670)
-        MainWindow.setMaximumSize(QtCore.QSize(16777215, 16777215))
+    def setupUi(self, RestWindow):
+        RestWindow.setObjectName("RestWindow")
+        RestWindow.resize(1200, 670)
+        RestWindow.setMaximumSize(QtCore.QSize(16777215, 16777215))
         font = QtGui.QFont()
         font.setBold(False)
         font.setWeight(50)
         font.setStrikeOut(False)
-        MainWindow.setFont(font)
-        self.centralwidget = QtWidgets.QWidget(parent=MainWindow)
+        RestWindow.setFont(font)
+        self.centralwidget = QtWidgets.QWidget(parent=RestWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.verticalLayout_2 = QtWidgets.QVBoxLayout(self.centralwidget)
         self.verticalLayout_2.setObjectName("verticalLayout_2")
@@ -92,33 +92,33 @@ class Ui_MainWindow(object):
         self.btn_move_rest_by_10_min.setObjectName("btn_move_rest_by_10_min")
         self.horizontalLayout_5.addWidget(self.btn_move_rest_by_10_min)
         self.verticalLayout_2.addLayout(self.horizontalLayout_5)
-        MainWindow.setCentralWidget(self.centralwidget)
+        RestWindow.setCentralWidget(self.centralwidget)
 
-        self.retranslateUi(MainWindow)
-        QtCore.QMetaObject.connectSlotsByName(MainWindow)
+        self.retranslateUi(RestWindow)
+        QtCore.QMetaObject.connectSlotsByName(RestWindow)
 
-    def retranslateUi(self, MainWindow):
+    def retranslateUi(self, RestWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "Resty"))
+        RestWindow.setWindowTitle(_translate("RestWindow", "Resty"))
         self.lbl_rest_message_text.setText(
-            _translate("MainWindow", "Time to have a break")
+            _translate("RestWindow", "Time to have a break")
         )
         self.btn_finish_rest.setText(
-            _translate("MainWindow", "Закончить перерыв")
+            _translate("RestWindow", "Закончить перерыв")
         )
         self.btn_move_rest_by_5_min.setText(
-            _translate("MainWindow", "Отложить перерыв на 5 мин")
+            _translate("RestWindow", "Отложить перерыв на 5 мин")
         )
         self.btn_move_rest_by_10_min.setText(
-            _translate("MainWindow", "Отложить перерыв на 10 мин")
+            _translate("RestWindow", "Отложить перерыв на 10 мин")
         )
 
 
 if __name__ == "__main__":
     import sys
     app = QtWidgets.QApplication(sys.argv)
-    MainWindow = QtWidgets.QMainWindow()
-    ui = Ui_MainWindow()
-    ui.setupUi(MainWindow)
-    MainWindow.show()
+    RestWindow = QtWidgets.QMainWindow()
+    ui = Ui_RestWindow()
+    ui.setupUi(RestWindow)
+    RestWindow.show()
     sys.exit(app.exec())
