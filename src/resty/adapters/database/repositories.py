@@ -1,6 +1,5 @@
 import copy
-
-from PyQt6.QtCore import QMutex
+from threading import Lock
 
 from resty.application.rest_timer import (
     ITimerRepo,
@@ -13,7 +12,7 @@ class TimerRepo(ITimerRepo):
     _rest_timer: RestTimer = None
 
     def __init__(self):
-        self.mutex = QMutex()
+        self.mutex = Lock()
 
     def create_rest_timer(
         self,
@@ -28,6 +27,5 @@ class TimerRepo(ITimerRepo):
         return copy.deepcopy(self._rest_timer)
 
     def save_rest_timer(self, rest_timer: RestTimer):
-        self.mutex.lock()
-        self._rest_timer = rest_timer
-        self.mutex.unlock()
+        with self.mutex:
+            self._rest_timer = rest_timer

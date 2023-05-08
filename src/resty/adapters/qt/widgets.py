@@ -19,6 +19,7 @@ from resty.application.rest_timer import (
 )
 
 from . import signals
+from .user_activity import UserActivityTracker
 
 BASE_DIR: Path = Path(__file__).parent
 
@@ -54,6 +55,8 @@ class RestWindow(QMainWindow):
 
     event_update_time_msec: float
 
+    user_activity_tracker: UserActivityTracker
+
     def __attrs_post_init__(self):
         super().__init__()
         self.logger = logging.getLogger(self.__class__.__name__)
@@ -69,9 +72,17 @@ class RestWindow(QMainWindow):
         self._register_signals()
 
         # запускаем поток сервиса с таймером
-        worker = Worker(self.rest_timer_service.start_timer)
-        self.threadpool.start(worker)
+        rest_timer_worker = Worker(self.rest_timer_service.start_timer)
+        self.threadpool.start(rest_timer_worker)
         self.logger.info('Rest timer is started')
+
+        user_activity_tracking_worker = Worker(
+            self.user_activity_tracker.start_tracking_user_activity,
+            on_user_not_active_status=self.stop_rest_timer,
+            on_user_activity_start=self.start_rest_timer
+        )
+        self.threadpool.start(user_activity_tracking_worker)
+        self.logger.info('User activity tracker is started')
 
         # обновляем tooltip со статусом таймера
         self.show_rest_timer_status_tooltip()

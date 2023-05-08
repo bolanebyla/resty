@@ -19,6 +19,8 @@ classic-components = "^1.0.0"
 pydantic = ">=1.8.2,<1.9.0"
 classic-app-layer = "^0.0.1"
 qt-material = "^2.14"
+keyboard = "^0.13.5"
+pyautogui = "^0.9.53"
 
 [tool.poetry.group.dev.dependencies]
 isort = "^5.12.0"
