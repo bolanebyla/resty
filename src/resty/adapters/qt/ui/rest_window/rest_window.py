@@ -21,13 +21,28 @@ class Ui_RestWindow(object):
         RestWindow.setFont(font)
         self.centralwidget = QtWidgets.QWidget(parent=RestWindow)
         self.centralwidget.setObjectName("centralwidget")
-        self.verticalLayout_2 = QtWidgets.QVBoxLayout(self.centralwidget)
-        self.verticalLayout_2.setObjectName("verticalLayout_2")
+        self.verticalLayout = QtWidgets.QVBoxLayout(self.centralwidget)
+        self.verticalLayout.setObjectName("verticalLayout")
+        self.horizontalLayout_6 = QtWidgets.QHBoxLayout()
+        self.horizontalLayout_6.setObjectName("horizontalLayout_6")
+        self.btn_move_rest_to_full_half_hour = QtWidgets.QPushButton(
+            parent=self.centralwidget
+        )
+        self.btn_move_rest_to_full_half_hour.setObjectName(
+            "btn_move_rest_to_full_half_hour"
+        )
+        self.horizontalLayout_6.addWidget(self.btn_move_rest_to_full_half_hour)
         spacerItem = QtWidgets.QSpacerItem(
+            40, 20, QtWidgets.QSizePolicy.Policy.Expanding,
+            QtWidgets.QSizePolicy.Policy.Minimum
+        )
+        self.horizontalLayout_6.addItem(spacerItem)
+        self.verticalLayout.addLayout(self.horizontalLayout_6)
+        spacerItem1 = QtWidgets.QSpacerItem(
             20, 40, QtWidgets.QSizePolicy.Policy.Minimum,
             QtWidgets.QSizePolicy.Policy.Expanding
         )
-        self.verticalLayout_2.addItem(spacerItem)
+        self.verticalLayout.addItem(spacerItem1)
         self.lbl_rest_message_text = QtWidgets.QLabel(parent=self.centralwidget)
         font = QtGui.QFont()
         font.setPointSize(26)
@@ -40,25 +55,25 @@ class Ui_RestWindow(object):
             QtCore.Qt.AlignmentFlag.AlignCenter
         )
         self.lbl_rest_message_text.setObjectName("lbl_rest_message_text")
-        self.verticalLayout_2.addWidget(self.lbl_rest_message_text)
-        spacerItem1 = QtWidgets.QSpacerItem(
+        self.verticalLayout.addWidget(self.lbl_rest_message_text)
+        spacerItem2 = QtWidgets.QSpacerItem(
             20, 40, QtWidgets.QSizePolicy.Policy.Minimum,
             QtWidgets.QSizePolicy.Policy.Expanding
         )
-        self.verticalLayout_2.addItem(spacerItem1)
+        self.verticalLayout.addItem(spacerItem2)
         self.lbl_remaining_rest_time = QtWidgets.QLabel(
             parent=self.centralwidget
         )
         self.lbl_remaining_rest_time.setText("")
         self.lbl_remaining_rest_time.setObjectName("lbl_remaining_rest_time")
-        self.verticalLayout_2.addWidget(self.lbl_remaining_rest_time)
+        self.verticalLayout.addWidget(self.lbl_remaining_rest_time)
         self.rest_progress_bar = QtWidgets.QProgressBar(
             parent=self.centralwidget
         )
         self.rest_progress_bar.setMaximum(100)
         self.rest_progress_bar.setProperty("value", 100)
         self.rest_progress_bar.setObjectName("rest_progress_bar")
-        self.verticalLayout_2.addWidget(self.rest_progress_bar)
+        self.verticalLayout.addWidget(self.rest_progress_bar)
         self.horizontalLayout_5 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_5.setContentsMargins(200, -1, 200, 30)
         self.horizontalLayout_5.setSpacing(30)
@@ -91,7 +106,7 @@ class Ui_RestWindow(object):
         self.btn_move_rest_by_10_min.setFont(font)
         self.btn_move_rest_by_10_min.setObjectName("btn_move_rest_by_10_min")
         self.horizontalLayout_5.addWidget(self.btn_move_rest_by_10_min)
-        self.verticalLayout_2.addLayout(self.horizontalLayout_5)
+        self.verticalLayout.addLayout(self.horizontalLayout_5)
         RestWindow.setCentralWidget(self.centralwidget)
 
         self.retranslateUi(RestWindow)
@@ -100,6 +115,9 @@ class Ui_RestWindow(object):
     def retranslateUi(self, RestWindow):
         _translate = QtCore.QCoreApplication.translate
         RestWindow.setWindowTitle(_translate("RestWindow", "Resty"))
+        self.btn_move_rest_to_full_half_hour.setText(
+            _translate("RestWindow", "!")
+        )
         self.lbl_rest_message_text.setText(
             _translate("RestWindow", "Time to have a break")
         )
