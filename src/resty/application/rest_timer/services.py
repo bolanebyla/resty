@@ -3,9 +3,38 @@ import time
 from datetime import datetime, timedelta
 from typing import Union
 
+import attr
 from classic.components import component
+from dateutil.tz import tzlocal
 
 from . import entities, enums, errors, interfaces
+
+
+@attr.frozen
+class FullHalfHourCalculator:
+    """
+    Калькулятор для расчёта времени до наступления 30 минут или 00 на часах
+    """
+
+    def calculate_full_half_hour_time_sec(self) -> int:
+        """
+        Рассчитывает количество секунд до наступления 30 минут или 00 на часах
+        относительно того к чему ближе
+
+        Например:
+            - если сейчас 15:20, то ближе 15:30, соответственно
+            рассчитывается время как `15:30 - 15:20 = 600 сек`;
+            - если сейчас 15:45, то ближе 16:00, соответственно
+            рассчитывается время как `16:00 - 15:45 = 900 сек`
+        """
+        now = datetime.now(tz=tzlocal())
+
+        if now.minute * 60 + now.second < 30 * 60:
+            half_hour_time = 30 * 60 - (now.minute * 60 + now.second)
+        else:
+            half_hour_time = 60 * 60 - (now.minute * 60 + now.second)
+
+        return half_hour_time
 
 
 @component
@@ -16,6 +45,8 @@ class RestTimerService:
     start_rest_signal: interfaces.ISignal
 
     event_update_time_msec: float
+
+    full_half_hour_calculator: FullHalfHourCalculator
 
     def __attrs_post_init__(self):
         self.logger = logging.getLogger(self.__class__.__name__)
@@ -102,7 +133,7 @@ class RestTimerService:
 
             time.sleep(self.event_update_time_msec / 1000)
 
-    def _move_rest(self, for_seconds: Union[float, int]):
+    def move_rest(self, for_seconds: Union[float, int]):
         """
         Отложить отдых на время (сек) - запустить работу на определенное время
         """
@@ -121,13 +152,19 @@ class RestTimerService:
         """
         Отложить отдых на 5 мин
         """
-        self._move_rest(for_seconds=5 * 60)
+        self.move_rest(for_seconds=5 * 60)
 
     def move_rest_by_10_min(self):
         """
         Отложить отдых на 10 мин
         """
-        self._move_rest(for_seconds=10 * 60)
+        self.move_rest(for_seconds=10 * 60)
+
+    def move_rest_to_full_half_hour(self):
+        for_seconds = (
+            self.full_half_hour_calculator.calculate_full_half_hour_time_sec()
+        )
+        self.move_rest(for_seconds=for_seconds)
 
     def finish_rest(self):
         """

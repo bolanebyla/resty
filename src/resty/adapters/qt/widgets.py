@@ -122,6 +122,24 @@ class RestWindow(QMainWindow):
         # форма должна появляться всегда на главном мониторе
         self.setScreen(self.primary_screen)
 
+        self.ui.btn_move_rest_to_full_half_hour.setStyleSheet(
+            '''
+            QPushButton {
+              border: none;
+            }
+        '''
+        )
+
+        self.ui.btn_move_rest_to_full_half_hour.setText('')
+        self.ui.btn_move_rest_to_full_half_hour.setIcon(
+            QtGui.QIcon(
+                str(
+                    BASE_DIR / 'resources' / 'images' / 'icons'
+                    / 'btn_move_rest_to_full_half_hour.svg'
+                )
+            )
+        )
+
     def _move_window_center(self):
         qr = self.frameGeometry()
         cp = self.screen().availableGeometry().center()
@@ -175,6 +193,9 @@ class RestWindow(QMainWindow):
             self.move_rest_by_10_min
         )
         self.ui.btn_finish_rest.clicked.connect(self.finish_rest)
+        self.ui.btn_move_rest_to_full_half_hour.clicked.connect(
+            self.move_rest_to_full_half_hour
+        )
 
     def start_work(self):
         self.logger.debug('Start work signal')
@@ -188,6 +209,20 @@ class RestWindow(QMainWindow):
         self.rest_progress_timer.start(self.event_update_time_msec)
         self.show()
 
+        self.ui.btn_move_rest_by_5_min.setEnabled(False)
+        self.ui.btn_move_rest_by_10_min.setEnabled(False)
+        self.ui.btn_finish_rest.setEnabled(False)
+
+        QTimer.singleShot(
+            5000, lambda: self.ui.btn_move_rest_by_5_min.setDisabled(False)
+        )
+        QTimer.singleShot(
+            5000, lambda: self.ui.btn_move_rest_by_10_min.setDisabled(False)
+        )
+        QTimer.singleShot(
+            5000, lambda: self.ui.btn_finish_rest.setDisabled(False)
+        )
+
     def move_rest_by_5_min(self):
         self.logger.debug('"move_rest_by_5_min" btn is pressed')
         self.rest_timer_service.move_rest_by_5_min()
@@ -199,6 +234,10 @@ class RestWindow(QMainWindow):
     def finish_rest(self):
         self.logger.debug('"finish_rest" btn is pressed')
         self.rest_timer_service.finish_rest()
+
+    def move_rest_to_full_half_hour(self):
+        self.logger.debug('"move_rest_to_full_half_hour" btn is pressed')
+        self.rest_timer_service.move_rest_to_full_half_hour()
 
     def rest_now(self):
         self.logger.debug('"rest_now" btn is pressed')
