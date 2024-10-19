@@ -2,19 +2,19 @@ import copy
 from threading import Lock
 
 from resty.application.rest_timer import (
-    ITimerRepo,
+    IRestTimerRepo,
     RestTimer,
     RestTimerStatuses,
 )
 
 
-class TimerRepo(ITimerRepo):
+class TimerRepo(IRestTimerRepo):
     _rest_timer: RestTimer = None
 
     def __init__(self):
         self.mutex = Lock()
 
-    def create_rest_timer(
+    def create(
         self,
         status: RestTimerStatuses,
     ) -> RestTimer:
@@ -23,9 +23,9 @@ class TimerRepo(ITimerRepo):
 
         return copy.deepcopy(self._rest_timer)
 
-    def get_rest_timer(self) -> RestTimer:
+    def get(self) -> RestTimer:
         return copy.deepcopy(self._rest_timer)
 
-    def save_rest_timer(self, rest_timer: RestTimer):
+    def save_and_flash(self, rest_timer: RestTimer):
         with self.mutex:
             self._rest_timer = rest_timer

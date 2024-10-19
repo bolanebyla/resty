@@ -5,7 +5,7 @@ from datetime import datetime
 from pathlib import Path
 from random import choice
 
-from classic.components import component
+from attr import define
 from PyQt6 import QtGui, uic
 from PyQt6.QtCore import Qt, QThreadPool, QTimer
 from PyQt6.QtGui import QAction, QIcon
@@ -18,7 +18,6 @@ from resty.application.rest_timer import (
     RestTimerStatuses,
 )
 
-from . import signals
 from .user_activity import UserActivityTracker
 
 BASE_DIR: Path = Path(__file__).parent
@@ -42,16 +41,13 @@ rest_message_texts = [
 ]
 
 
-@component
+@define
 class RestWindow(QMainWindow):
     ui = None
 
     primary_screen: QtGui.QScreen
 
     rest_timer_service: RestTimerService
-
-    start_work_signal: signals.StartWorkSignal
-    start_rest_signal: signals.StartRestSignal
 
     event_update_time_msec: float
 
@@ -67,14 +63,12 @@ class RestWindow(QMainWindow):
 
     def on_create(self):
         self.logger.info('Creating %s...', self.__class__.__name__)
+        # создаём таймер
+        self.rest_timer_service.create_rest_timer()
+
         self._init_ui()
         self._init_tray()
         self._register_signals()
-
-        # запускаем поток сервиса с таймером
-        rest_timer_worker = Worker(self.rest_timer_service.start_timer)
-        self.threadpool.start(rest_timer_worker)
-        self.logger.info('Rest timer is started')
 
         user_activity_tracking_worker = Worker(
             self.user_activity_tracker.start_tracking_user_activity,
@@ -89,7 +83,7 @@ class RestWindow(QMainWindow):
 
     def _init_ui(self):
         try:
-            from .ui.rest_window import rest_window
+            from .ui.rest_window import rest_window    # noqa
 
             self.ui = rest_window.Ui_RestWindow()
             self.ui.setupUi(self)
@@ -185,9 +179,6 @@ class RestWindow(QMainWindow):
         tray_timer.start(self.event_update_time_msec)
 
     def _register_signals(self):
-        self.start_work_signal.signal.connect(self.start_work)
-        self.start_rest_signal.signal.connect(self.start_rest)
-
         self.ui.btn_move_rest_by_5_min.clicked.connect(self.move_rest_by_5_min)
         self.ui.btn_move_rest_by_10_min.clicked.connect(
             self.move_rest_by_10_min
@@ -197,13 +188,49 @@ class RestWindow(QMainWindow):
             self.move_rest_to_full_half_hour
         )
 
-    def start_work(self):
-        self.logger.debug('Start work signal')
+        rest_window_events_timer = QTimer(self)
+
+        rest_window_events_timer.timeout.connect(
+            self.rest_timer_service.update_rest_timer_state
+        )
+        rest_window_events_timer.start(self.event_update_time_msec)
+
+    def move_rest_by_5_min(self):
+        self.logger.debug('"move_rest_by_5_min" btn is pressed')
+        self.rest_timer_service.move_rest_by_5_min()
+        self._hide_rest_window()
+
+    def move_rest_by_10_min(self):
+        self.logger.debug('"move_rest_by_10_min" btn is pressed')
+        self.rest_timer_service.move_rest_by_10_min()
+        self._hide_rest_window()
+
+    def finish_rest(self):
+        self.logger.debug('"finish_rest" btn is pressed')
+        self.rest_timer_service.finish_rest()
+        self._hide_rest_window()
+
+    def move_rest_to_full_half_hour(self):
+        self.logger.debug('"move_rest_to_full_half_hour" btn is pressed')
+        self.rest_timer_service.move_rest_to_full_half_hour()
+        self._hide_rest_window()
+
+    def _hide_rest_window(self):
+        """
+        Скрывает окно отдыха
+        """
         self.hide()
         self.rest_progress_timer.stop()
 
-    def start_rest(self):
-        self.logger.debug('Start rest signal')
+    def rest_now(self):
+        self.logger.debug('"rest_now" btn is pressed')
+        self.rest_timer_service.rest_now()
+        self._show_rest_window()
+
+    def _show_rest_window(self):
+        """
+        Показывает окно отдыха
+        """
         self.ui.lbl_rest_message_text.setText(choice(rest_message_texts))
         self.ui.rest_progress_bar.setValue(100)
         self.rest_progress_timer.start(self.event_update_time_msec)
@@ -223,33 +250,13 @@ class RestWindow(QMainWindow):
             5000, lambda: self.ui.btn_finish_rest.setDisabled(False)
         )
 
-    def move_rest_by_5_min(self):
-        self.logger.debug('"move_rest_by_5_min" btn is pressed')
-        self.rest_timer_service.move_rest_by_5_min()
-
-    def move_rest_by_10_min(self):
-        self.logger.debug('"move_rest_by_10_min" btn is pressed')
-        self.rest_timer_service.move_rest_by_10_min()
-
-    def finish_rest(self):
-        self.logger.debug('"finish_rest" btn is pressed')
-        self.rest_timer_service.finish_rest()
-
-    def move_rest_to_full_half_hour(self):
-        self.logger.debug('"move_rest_to_full_half_hour" btn is pressed')
-        self.rest_timer_service.move_rest_to_full_half_hour()
-
-    def rest_now(self):
-        self.logger.debug('"rest_now" btn is pressed')
-        self.rest_timer_service.rest_now()
-
     def stop_rest_timer(self):
         """
         Остановить таймер
         """
         self.logger.debug('"stop" btn is pressed')
-        self.hide()
         self.rest_timer_service.stop()
+        self._hide_rest_window()
 
     def start_rest_timer(self):
         """
@@ -263,7 +270,6 @@ class RestWindow(QMainWindow):
         Выйти из приложения (закрыть)
         """
         self.logger.debug('"exit" btn is pressed')
-        self.rest_timer_service.exit()
         self.close()
         sys.exit()
 
@@ -271,35 +277,31 @@ class RestWindow(QMainWindow):
         """
         Вывести подсказку с состоянием таймера
         """
-        try:
-            rest_timer = self.rest_timer_service.get_rest_timer()
-        except RestTimerNotFound:
-            rest_timer = None
+        rest_timer = self.rest_timer_service.get_rest_timer()
 
         tool_tip_title = 'Resty'
         tool_tip_message = ''
 
-        if rest_timer is not None:
-            # если сейчас работа, выводим время до перерыва
-            if rest_timer.status == RestTimerStatuses.work:
-                # определяем сколько времени осталось до следующего перерыва
-                next_break_time = rest_timer.end_event_time - datetime.now()
+        # если сейчас работа, выводим время до перерыва
+        if rest_timer.status == RestTimerStatuses.work:
+            # определяем сколько времени осталось до следующего перерыва
+            next_break_time = rest_timer.end_event_time - datetime.now()
 
-                # переводим оставшееся время в минуты
-                # (округляем в большую сторону)
-                next_break_time_minutes = math.ceil(
-                    next_break_time.total_seconds() / 60
-                )
-                tool_tip_message = (
-                    f'{next_break_time_minutes} '
-                    f'мин до следующего перерыва'
-                )
+            # переводим оставшееся время в минуты
+            # (округляем в большую сторону)
+            next_break_time_minutes = math.ceil(
+                next_break_time.total_seconds() / 60
+            )
+            tool_tip_message = (
+                f'{next_break_time_minutes} '
+                f'мин до следующего перерыва'
+            )
 
-            elif rest_timer.status == RestTimerStatuses.rest:
-                tool_tip_message = 'Отдых...'
+        elif rest_timer.status == RestTimerStatuses.rest:
+            tool_tip_message = 'Отдых...'
 
-            elif rest_timer.status == RestTimerStatuses.stop:
-                tool_tip_message = 'Остановлен'
+        elif rest_timer.status == RestTimerStatuses.stop:
+            tool_tip_message = 'Остановлен'
 
         tool_tip_text = f'{tool_tip_title}\n{tool_tip_message}'
 
