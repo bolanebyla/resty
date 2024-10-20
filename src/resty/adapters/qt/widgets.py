@@ -7,7 +7,7 @@ from random import choice
 
 from attr import define
 from PyQt6 import QtGui, uic
-from PyQt6.QtCore import Qt, QThreadPool, QTimer
+from PyQt6.QtCore import Qt, QTimer
 from PyQt6.QtGui import QAction, QIcon
 from PyQt6.QtWidgets import QMainWindow, QMenu, QSystemTrayIcon
 
@@ -58,9 +58,6 @@ class RestWindow(QMainWindow):
     def __attrs_post_init__(self):
         super().__init__()
         self.logger = logging.getLogger(self.__class__.__name__)
-
-        self.threadpool = QThreadPool()
-
         self.on_create()
 
     def on_create(self):
