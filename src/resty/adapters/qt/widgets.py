@@ -5,6 +5,7 @@ from datetime import datetime
 from pathlib import Path
 from random import choice
 
+from attr import define
 from PyQt6 import QtGui, uic
 from PyQt6.QtCore import Qt, QThreadPool, QTimer
 from PyQt6.QtGui import QAction, QIcon
@@ -17,8 +18,6 @@ from resty.application.rest_timer import (
 )
 
 from .user_activity import UserActivityTracker
-
-from attr import define
 
 BASE_DIR: Path = Path(__file__).parent
 
