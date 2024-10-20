@@ -123,12 +123,12 @@ class RestTimerService:
         if rest_timer.status == enums.RestTimerStatuses.work:
             if rest_timer.end_event_time <= time_now:
                 # запускаем отдых
-                self.rest_timer_service.start_rest(rest_timer=rest_timer)
+                self.start_rest(rest_timer=rest_timer)
 
         elif rest_timer.status == enums.RestTimerStatuses.rest:
             if rest_timer.end_event_time <= time_now:
                 # запускаем работу
-                self.rest_timer_service.start_work(rest_timer=rest_timer)
+                self.start_work(rest_timer=rest_timer)
 
     def move_rest(self, for_seconds: Union[float, int]):
         """

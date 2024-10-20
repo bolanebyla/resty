@@ -5,13 +5,11 @@ from datetime import datetime
 from pathlib import Path
 from random import choice
 
-from attr import define
 from PyQt6 import QtGui, uic
 from PyQt6.QtCore import Qt, QThreadPool, QTimer
 from PyQt6.QtGui import QAction, QIcon
 from PyQt6.QtWidgets import QMainWindow, QMenu, QSystemTrayIcon
 
-from resty.adapters.qt.handlers import Worker
 from resty.application.rest_timer import (
     RestTimerNotFound,
     RestTimerService,
@@ -19,6 +17,8 @@ from resty.application.rest_timer import (
 )
 
 from .user_activity import UserActivityTracker
+
+from attr import define
 
 BASE_DIR: Path = Path(__file__).parent
 
@@ -53,6 +53,9 @@ class RestWindow(QMainWindow):
 
     user_activity_tracker: UserActivityTracker
 
+    # отдых запущен (показывается окно отдыха)
+    _rest_started: bool = False
+
     def __attrs_post_init__(self):
         super().__init__()
         self.logger = logging.getLogger(self.__class__.__name__)
@@ -70,12 +73,18 @@ class RestWindow(QMainWindow):
         self._init_tray()
         self._register_signals()
 
-        user_activity_tracking_worker = Worker(
-            self.user_activity_tracker.start_tracking_user_activity,
-            on_user_not_active_status=self.stop_rest_timer,
-            on_user_activity_start=self.start_rest_timer
+        # запускаем отслеживание событий активности пользователя
+        user_activity_timer = QTimer(self)
+        user_activity_timer.timeout.connect(
+            lambda: self.user_activity_tracker.processing_user_activity_events(
+                on_user_not_active_status=self.stop_rest_timer,
+                on_user_activity_start=self.start_rest_timer,
+            )
         )
-        self.threadpool.start(user_activity_tracking_worker)
+        user_activity_timer.timeout.connect(
+            self.user_activity_tracker.track_user_activity
+        )
+        user_activity_timer.start(self.event_update_time_msec)
         self.logger.info('User activity tracker is started')
 
         # обновляем tooltip со статусом таймера
@@ -193,7 +202,25 @@ class RestWindow(QMainWindow):
         rest_window_events_timer.timeout.connect(
             self.rest_timer_service.update_rest_timer_state
         )
+        rest_window_events_timer.timeout.connect(
+            self._process_rest_timer_events
+        )
         rest_window_events_timer.start(self.event_update_time_msec)
+
+    def _process_rest_timer_events(self):
+        """
+        Обрабатывает события таймера
+        """
+        rest_timer = self.rest_timer_service.get_rest_timer()
+
+        # событие отдыха
+        if (not self._rest_started
+                and rest_timer.status == RestTimerStatuses.rest):
+            self.rest_now()
+
+        # событие работы
+        if self._rest_started and rest_timer.status == RestTimerStatuses.work:
+            self.finish_rest()
 
     def move_rest_by_5_min(self):
         self.logger.debug('"move_rest_by_5_min" btn is pressed')
@@ -221,11 +248,13 @@ class RestWindow(QMainWindow):
         """
         self.hide()
         self.rest_progress_timer.stop()
+        self._rest_started = False
 
     def rest_now(self):
         self.logger.debug('"rest_now" btn is pressed')
         self.rest_timer_service.rest_now()
         self._show_rest_window()
+        self._rest_started = True
 
     def _show_rest_window(self):
         """
@@ -264,6 +293,7 @@ class RestWindow(QMainWindow):
         """
         self.logger.debug('"start" btn is pressed')
         self.rest_timer_service.start()
+        self._hide_rest_window()
 
     def exit(self):
         """
@@ -311,6 +341,7 @@ class RestWindow(QMainWindow):
         """
         Обновляет значение прогресс-бара перерыва (от 100% к 0)
         """
+        # TODO: убрать try-except
         try:
             rest_timer = self.rest_timer_service.get_rest_timer()
         except RestTimerNotFound as e:
@@ -328,6 +359,7 @@ class RestWindow(QMainWindow):
         """
         Обновляет таймер оставшегося времени перерыва
         """
+        # TODO: убрать try-except
         try:
             rest_timer = self.rest_timer_service.get_rest_timer()
         except RestTimerNotFound as e:

@@ -30,10 +30,7 @@ class Application:
 
 class Qt:
     user_activity_tracker = UserActivityTracker(
-        mouse_movement_tracking_time_sec=Settings.qt.
-        MOUSE_MOVEMENT_TRACKING_TIME_SEC,
-        user_activity_tracking_time_sec=Settings.qt.
-        USER_ACTIVITY_TRACKING_TIME_SEC,
+        event_update_time_msec=Settings.qt.EVENT_UPDATE_TIME_MSEC,
         rest_timer_service=Application.rest_timer_service,
     )
 
