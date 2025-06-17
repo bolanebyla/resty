@@ -6,7 +6,7 @@ from qt_material import apply_stylesheet
 
 from resty.application import rest_timer
 
-from . import signals, widgets
+from . import widgets
 from .user_activity import UserActivityTracker
 
 BASE_DIR: Path = Path(__file__).parent
@@ -25,8 +25,6 @@ class App(QApplication):
 def create_app(
     event_update_time_msec: float,
     rest_timer_service: rest_timer.RestTimerService,
-    start_work_signal: signals.StartWorkSignal,
-    start_rest_signal: signals.StartRestSignal,
     user_activity_tracker: UserActivityTracker
 ):
     app = App(sys.argv)
@@ -46,8 +44,6 @@ def create_app(
             event_update_time_msec=event_update_time_msec,
             primary_screen=app.primaryScreen(),
             rest_timer_service=rest_timer_service,
-            start_work_signal=start_work_signal,
-            start_rest_signal=start_rest_signal,
             user_activity_tracker=user_activity_tracker,
         )
     )

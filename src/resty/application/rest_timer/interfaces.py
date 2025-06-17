@@ -1,23 +1,24 @@
 from abc import ABC, abstractmethod
+from typing import Optional
 
 from . import entities, enums
 
 
-class ITimerRepo(ABC):
+class IRestTimerRepo(ABC):
 
     @abstractmethod
-    def create_rest_timer(
+    def create(
         self,
         status: enums.RestTimerStatuses,
     ) -> entities.RestTimer:
         ...
 
     @abstractmethod
-    def get_rest_timer(self) -> entities.RestTimer:
+    def get(self) -> Optional[entities.RestTimer]:
         ...
 
     @abstractmethod
-    def save_rest_timer(
+    def save_and_flash(
         self, rest_timer: entities.RestTimer
     ) -> entities.RestTimer:
         ...

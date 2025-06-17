@@ -5,4 +5,3 @@ class RestTimerStatuses(Enum):
     rest = 'rest'
     work = 'work'
     stop = 'stop'
-    exit = 'exit'
